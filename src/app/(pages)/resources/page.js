@@ -1,9 +1,11 @@
+'use client'
+
 export default function ResourcesPage() {
   const resources = {
     documentation: [
       {
-        title: "Python Official Documentation",
-        description: "Comprehensive guide to Python programming language",
+        title: "Python Documentation",
+        description: "Official Python language documentation and tutorials",
         url: "https://docs.python.org/3/",
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -12,8 +14,18 @@ export default function ResourcesPage() {
         ),
       },
       {
+        title: "NLTK Documentation",
+        description: "Natural Language Toolkit documentation",
+        url: "https://www.nltk.org/",
+        icon: (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+          </svg>
+        ),
+      },
+      {
         title: "Pandas Documentation",
-        description: "Learn about data manipulation with Pandas",
+        description: "Data manipulation and analysis library docs",
         url: "https://pandas.pydata.org/docs/",
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,11 +79,11 @@ export default function ResourcesPage() {
       },
       {
         title: "Real Python Tutorials",
-        description: "Practical Python programming tutorials",
+        description: "In-depth Python tutorials and articles",
         url: "https://realpython.com/",
         icon: (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
           </svg>
         ),
       },
@@ -79,18 +91,38 @@ export default function ResourcesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div 
+      className="min-h-screen py-12"
+      style={{ backgroundColor: 'var(--color-dark)' }}
+    >
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">Learning Resources</h1>
-          <p className="text-lg text-gray-600 mb-12">
+          <h1 
+            className="text-4xl font-bold mb-8"
+            style={{
+              background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
+          >
+            Learning Resources
+          </h1>
+          <p 
+            className="text-lg mb-12"
+            style={{ color: 'var(--text-secondary)' }}
+          >
             Access documentation, cheat sheets, and additional resources to support your
             Python learning journey.
           </p>
 
           {/* Documentation Section */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Documentation</h2>
+            <h2 
+              className="text-2xl font-bold mb-6"
+              style={{ color: 'var(--text-accent)' }}
+            >
+              Documentation
+            </h2>
             <div className="grid gap-6 md:grid-cols-2">
               {resources.documentation.map((doc, index) => (
                 <a
@@ -98,12 +130,33 @@ export default function ResourcesPage() {
                   href={doc.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  className="flex items-start p-6 rounded-lg transition-all duration-300"
+                  style={{
+                    backgroundColor: 'var(--card-background)',
+                    borderColor: 'var(--card-border)',
+                    boxShadow: 'var(--card-shadow)',
+                    ':hover': {
+                      boxShadow: 'var(--effect-cardHover)',
+                      transform: 'translateY(-2px)'
+                    }
+                  }}
                 >
-                  <div className="flex-shrink-0 text-primary">{doc.icon}</div>
+                  <div 
+                    className="flex-shrink-0"
+                    style={{ color: 'var(--text-accent)' }}
+                  >
+                    {doc.icon}
+                  </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-gray-900">{doc.title}</h3>
-                    <p className="text-gray-600">{doc.description}</p>
+                    <h3 
+                      className="text-lg font-semibold"
+                      style={{ color: 'var(--text-primary)' }}
+                    >
+                      {doc.title}
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)' }}>
+                      {doc.description}
+                    </p>
                   </div>
                 </a>
               ))}
@@ -112,18 +165,44 @@ export default function ResourcesPage() {
 
           {/* Cheat Sheets Section */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Cheat Sheets</h2>
+            <h2 
+              className="text-2xl font-bold mb-6"
+              style={{ color: 'var(--text-accent)' }}
+            >
+              Cheat Sheets
+            </h2>
             <div className="grid gap-6 md:grid-cols-2">
               {resources.cheatSheets.map((sheet, index) => (
                 <a
                   key={index}
                   href={sheet.downloadUrl}
-                  className="flex items-start p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  className="flex items-start p-6 rounded-lg transition-all duration-300"
+                  style={{
+                    backgroundColor: 'var(--card-background)',
+                    borderColor: 'var(--card-border)',
+                    boxShadow: 'var(--card-shadow)',
+                    ':hover': {
+                      boxShadow: 'var(--effect-cardHover)',
+                      transform: 'translateY(-2px)'
+                    }
+                  }}
                 >
-                  <div className="flex-shrink-0 text-accent">{sheet.icon}</div>
+                  <div 
+                    className="flex-shrink-0"
+                    style={{ color: 'var(--text-accent)' }}
+                  >
+                    {sheet.icon}
+                  </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-gray-900">{sheet.title}</h3>
-                    <p className="text-gray-600">{sheet.description}</p>
+                    <h3 
+                      className="text-lg font-semibold"
+                      style={{ color: 'var(--text-primary)' }}
+                    >
+                      {sheet.title}
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)' }}>
+                      {sheet.description}
+                    </p>
                   </div>
                 </a>
               ))}
@@ -132,7 +211,12 @@ export default function ResourcesPage() {
 
           {/* Additional Resources Section */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Additional Resources</h2>
+            <h2 
+              className="text-2xl font-bold mb-6"
+              style={{ color: 'var(--text-accent)' }}
+            >
+              Additional Resources
+            </h2>
             <div className="grid gap-6 md:grid-cols-2">
               {resources.additionalResources.map((resource, index) => (
                 <a
@@ -140,12 +224,33 @@ export default function ResourcesPage() {
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  className="flex items-start p-6 rounded-lg transition-all duration-300"
+                  style={{
+                    backgroundColor: 'var(--card-background)',
+                    borderColor: 'var(--card-border)',
+                    boxShadow: 'var(--card-shadow)',
+                    ':hover': {
+                      boxShadow: 'var(--effect-cardHover)',
+                      transform: 'translateY(-2px)'
+                    }
+                  }}
                 >
-                  <div className="flex-shrink-0 text-primary">{resource.icon}</div>
+                  <div 
+                    className="flex-shrink-0"
+                    style={{ color: 'var(--text-accent)' }}
+                  >
+                    {resource.icon}
+                  </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-gray-900">{resource.title}</h3>
-                    <p className="text-gray-600">{resource.description}</p>
+                    <h3 
+                      className="text-lg font-semibold"
+                      style={{ color: 'var(--text-primary)' }}
+                    >
+                      {resource.title}
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)' }}>
+                      {resource.description}
+                    </p>
                   </div>
                 </a>
               ))}

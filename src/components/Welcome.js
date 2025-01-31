@@ -43,8 +43,18 @@ export default function Welcome() {
   }
 
   return (
-    <div className="bg-[#112240] rounded-lg p-4 mb-8 border border-[#00E6E6]/20">
-      <p className="text-[#E6FFFF]/90 text-lg">
+    <div 
+      className="rounded-lg p-4 mb-8 border transition-all duration-300"
+      style={{ 
+        backgroundColor: 'var(--card-background)',
+        borderColor: 'var(--card-border)',
+        boxShadow: 'var(--card-shadow)'
+      }}
+    >
+      <p 
+        className="text-lg"
+        style={{ color: 'var(--text-primary)' }}
+      >
         {getWelcomeMessage()}
       </p>
     </div>

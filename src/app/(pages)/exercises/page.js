@@ -1,53 +1,62 @@
+'use client'
+
 export default function ExercisesPage() {
   const exercises = [
     {
       id: 1,
-      title: "String Manipulation",
-      description: "Practice working with strings, string methods, and formatting in Python.",
+      title: "Python Basics",
+      description: "Practice fundamental Python concepts including variables, data types, and basic operations.",
       difficulty: "Beginner",
-      estimatedTime: "30 mins",
-      topics: ["Strings", "Methods", "Formatting"],
+      estimatedTime: "30 minutes",
+      topics: ["Variables", "Data Types", "Operations"]
     },
     {
       id: 2,
-      title: "List Operations",
-      description: "Master list operations including slicing, sorting, and list comprehensions.",
+      title: "Control Flow",
+      description: "Work with if statements, loops, and conditional expressions.",
       difficulty: "Beginner",
-      estimatedTime: "45 mins",
-      topics: ["Lists", "Sorting", "Comprehensions"],
+      estimatedTime: "45 minutes",
+      topics: ["If Statements", "Loops", "Conditionals"]
     },
     {
       id: 3,
-      title: "Dictionary Challenges",
-      description: "Learn to work with dictionaries through practical exercises.",
+      title: "Functions and Modules",
+      description: "Create and use functions, import modules, and understand scope.",
       difficulty: "Intermediate",
       estimatedTime: "1 hour",
-      topics: ["Dictionaries", "Key-Value Pairs", "Methods"],
+      topics: ["Functions", "Modules", "Scope"]
     },
     {
       id: 4,
       title: "Data Analysis with Pandas",
-      description: "Practice data manipulation and analysis using Pandas DataFrame.",
-      difficulty: "Intermediate",
-      estimatedTime: "1.5 hours",
-      topics: ["Pandas", "DataFrame", "Analysis"],
-    },
-    {
-      id: 5,
-      title: "Visualization Challenge",
-      description: "Create various types of plots using Matplotlib and Seaborn.",
+      description: "Analyze linguistic data using Pandas DataFrames.",
       difficulty: "Advanced",
-      estimatedTime: "2 hours",
-      topics: ["Matplotlib", "Seaborn", "Plotting"],
-    },
+      estimatedTime: "1.5 hours",
+      topics: ["Pandas", "Data Analysis", "Statistics"]
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div 
+      className="min-h-screen py-12"
+      style={{ backgroundColor: 'var(--color-dark)' }}
+    >
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">Interactive Exercises</h1>
-          <p className="text-lg text-gray-600 mb-12">
+          <h1 
+            className="text-4xl font-bold mb-8"
+            style={{
+              background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
+          >
+            Interactive Exercises
+          </h1>
+          <p 
+            className="text-lg mb-12"
+            style={{ color: 'var(--text-secondary)' }}
+          >
             Put your Python skills to the test with our interactive exercises. Each exercise
             includes real-time feedback and hints to help you learn.
           </p>
@@ -56,36 +65,77 @@ export default function ExercisesPage() {
             {exercises.map((exercise) => (
               <div
                 key={exercise.id}
-                className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+                className="rounded-lg p-6 transition-all duration-300"
+                style={{
+                  backgroundColor: 'var(--card-background)',
+                  borderColor: 'var(--card-border)',
+                  boxShadow: 'var(--card-shadow)'
+                }}
               >
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                <h2 
+                  className="text-xl font-semibold mb-3"
+                  style={{ color: 'var(--text-accent)' }}
+                >
                   {exercise.title}
                 </h2>
-                <p className="text-gray-600 mb-4">{exercise.description}</p>
+                <p 
+                  className="mb-4"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  {exercise.description}
+                </p>
                 
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-500">Difficulty:</span>
-                    <span className={`
-                      inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                      ${exercise.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' :
-                        exercise.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'}
-                    `}>
+                    <span 
+                      className="text-sm font-medium"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      Difficulty:
+                    </span>
+                    <span 
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      style={{
+                        backgroundColor: exercise.difficulty === 'Beginner' 
+                          ? 'var(--interactive-hover)20'
+                          : exercise.difficulty === 'Intermediate'
+                          ? 'var(--color-secondary)20'
+                          : 'var(--color-accent)20',
+                        color: exercise.difficulty === 'Beginner'
+                          ? 'var(--interactive-hover)'
+                          : exercise.difficulty === 'Intermediate'
+                          ? 'var(--color-secondary)'
+                          : 'var(--color-accent)'
+                      }}
+                    >
                       {exercise.difficulty}
                     </span>
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-gray-500">Time:</span>
-                    <span className="text-sm text-gray-600">{exercise.estimatedTime}</span>
+                    <span 
+                      className="text-sm font-medium"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      Time:
+                    </span>
+                    <span 
+                      className="text-sm"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      {exercise.estimatedTime}
+                    </span>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
                     {exercise.topics.map((topic, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        style={{
+                          backgroundColor: 'var(--text-accent)20',
+                          color: 'var(--text-accent)'
+                        }}
                       >
                         {topic}
                       </span>
@@ -96,7 +146,12 @@ export default function ExercisesPage() {
                 <div className="mt-6">
                   <a
                     href={`/exercises/${exercise.id}`}
-                    className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 transition-colors"
+                    className="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-300"
+                    style={{
+                      background: 'linear-gradient(to right, var(--color-accent), var(--color-secondary))',
+                      color: 'var(--text-inverse)',
+                      boxShadow: 'var(--effect-buttonHover)'
+                    }}
                   >
                     Start Exercise
                     <svg

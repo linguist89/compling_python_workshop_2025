@@ -4,6 +4,7 @@ import WelcomePopup from '@/components/WelcomePopup'
 import Welcome from '@/components/Welcome'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import ThemeProvider from '@/components/ThemeProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 const firaCode = Fira_Code({ subsets: ['latin'] })
@@ -17,15 +18,17 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} min-h-screen flex flex-col`}>
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0A192F] to-[#050B18]">
-          <Navbar />
-          <main className="flex-grow container mx-auto px-4 py-8">
-            <Welcome />
-            {children}
-          </main>
-          <Footer />
-          <WelcomePopup />
-        </div>
+        <ThemeProvider>
+          <div className="min-h-screen flex flex-col bg-gradient-to-br from-[var(--color-background)] to-[var(--color-dark)]">
+            <Navbar />
+            <main className="flex-grow container mx-auto px-4 py-8">
+              <Welcome />
+              {children}
+            </main>
+            <Footer />
+            <WelcomePopup />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )

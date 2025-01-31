@@ -1,28 +1,30 @@
+'use client'
+
 export default function ProjectsPage() {
   const projects = [
     {
       id: 1,
       title: "Text Analysis Tool",
-      description: "Build a tool that analyzes text documents for word frequency, sentiment, and readability metrics.",
-      skills: ["Text Processing", "NLTK", "Data Analysis"],
+      description: "Build a command-line tool for analyzing text files, including word frequency, readability scores, and basic NLP features.",
+      skills: ["File I/O", "Text Processing", "CLI"],
       duration: "1-2 weeks",
-      image: "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
+      image: "https://images.unsplash.com/photo-1555952517-2e8e729e0b44?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
     },
     {
       id: 2,
-      title: "Corpus Explorer",
-      description: "Create an interactive tool to explore and analyze linguistic corpora using Python and Pandas.",
-      skills: ["Pandas", "Data Visualization", "Web Scraping"],
-      duration: "2-3 weeks",
-      image: "https://images.unsplash.com/photo-1518932945647-7a1c969f8be2?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
+      title: "Corpus Analyzer",
+      description: "Create a tool to analyze linguistic corpora, extract patterns, and generate statistics.",
+      skills: ["NLTK", "Regular Expressions", "Statistics"],
+      duration: "2 weeks",
+      image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
     },
     {
       id: 3,
-      title: "Language Pattern Detector",
-      description: "Develop a program that identifies linguistic patterns and generates statistics from text data.",
-      skills: ["Regular Expressions", "Pattern Matching", "Statistics"],
-      duration: "1-2 weeks",
-      image: "https://images.unsplash.com/photo-1555952494-efd681c7e3f9?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
+      title: "Language Model",
+      description: "Implement a simple n-gram language model for text generation and probability estimation.",
+      skills: ["Probability", "NLP", "Algorithms"],
+      duration: "2-3 weeks",
+      image: "https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
     },
     {
       id: 4,
@@ -35,11 +37,26 @@ export default function ProjectsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div 
+      className="min-h-screen py-12"
+      style={{ backgroundColor: 'var(--color-dark)' }}
+    >
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">Python Projects</h1>
-          <p className="text-lg text-gray-600 mb-12">
+          <h1 
+            className="text-4xl font-bold mb-8"
+            style={{
+              background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
+          >
+            Python Projects
+          </h1>
+          <p 
+            className="text-lg mb-12"
+            style={{ color: 'var(--text-secondary)' }}
+          >
             Apply your Python skills to real-world computational linguistics projects.
             Each project includes starter code, documentation, and step-by-step guidance.
           </p>
@@ -48,7 +65,16 @@ export default function ProjectsPage() {
             {projects.map((project) => (
               <div
                 key={project.id}
-                className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                className="rounded-lg overflow-hidden transition-all duration-300"
+                style={{
+                  backgroundColor: 'var(--card-background)',
+                  borderColor: 'var(--card-border)',
+                  boxShadow: 'var(--card-shadow)',
+                  ':hover': {
+                    boxShadow: 'var(--effect-cardHover)',
+                    transform: 'translateY(-2px)'
+                  }
+                }}
               >
                 <div className="h-48 overflow-hidden">
                   <img
@@ -58,19 +84,36 @@ export default function ProjectsPage() {
                   />
                 </div>
                 <div className="p-6">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-3">
+                  <h2 
+                    className="text-2xl font-semibold mb-3"
+                    style={{ color: 'var(--text-accent)' }}
+                  >
                     {project.title}
                   </h2>
-                  <p className="text-gray-600 mb-4">{project.description}</p>
+                  <p 
+                    className="mb-4"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    {project.description}
+                  </p>
                   
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-2">Required Skills:</h3>
+                      <h3 
+                        className="text-sm font-medium mb-2"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
+                        Required Skills:
+                      </h3>
                       <div className="flex flex-wrap gap-2">
                         {project.skills.map((skill, index) => (
                           <span
                             key={index}
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                            style={{
+                              backgroundColor: 'var(--text-accent)20',
+                              color: 'var(--text-accent)'
+                            }}
                           >
                             {skill}
                           </span>
@@ -79,12 +122,20 @@ export default function ProjectsPage() {
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500">
+                      <span 
+                        className="text-sm"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
                         Duration: {project.duration}
                       </span>
                       <a
                         href={`/projects/${project.id}`}
-                        className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 transition-colors"
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-300"
+                        style={{
+                          background: 'linear-gradient(to right, var(--color-accent), var(--color-secondary))',
+                          color: 'var(--text-inverse)',
+                          boxShadow: 'var(--effect-buttonHover)'
+                        }}
                       >
                         View Project
                         <svg

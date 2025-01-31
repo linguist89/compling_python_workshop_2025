@@ -1,9 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export default function Navbar() {
   const [userName, setUserName] = useState('')
+  const pathname = usePathname()
 
   useEffect(() => {
     const savedName = localStorage.getItem('userName')
@@ -13,23 +16,65 @@ export default function Navbar() {
   }, [])
 
   return (
-    <nav className="backdrop-blur-md bg-[#0A192F]/90 border-b border-[#00E6E6]/20 sticky top-0 z-50">
+    <nav style={{
+      backgroundColor: 'var(--navbar-background)',
+      borderColor: 'var(--navbar-border)',
+      backdropFilter: 'blur(8px)'
+    }} className="sticky top-0 z-50 border-b">
       <div className="container mx-auto py-4">
         <div className="flex items-center justify-between">
-          <a href="/" className="text-2xl font-bold heading-gradient hover:opacity-80 transition-all duration-300">PyCL Workshop</a>
+          <Link 
+            href="/" 
+            className="text-2xl font-bold transition-all duration-300 hover:opacity-80"
+            style={{
+              background: `linear-gradient(to right, var(--text-accent), var(--color-secondary))`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            PyCL Workshop
+          </Link>
           <div className="flex items-center space-x-6">
-            <a href="/lessons" className="neon-link">Lessons</a>
-            <a href="/exercises" className="neon-link">Exercises</a>
-            <a href="/projects" className="neon-link">Projects</a>
-            <a href="/resources" className="neon-link">Resources</a>
+            {[
+              { href: '/lessons', label: 'Lessons' },
+              { href: '/exercises', label: 'Exercises' },
+              { href: '/projects', label: 'Projects' },
+              { href: '/resources', label: 'Resources' },
+            ].map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="relative transition-colors duration-300"
+                style={{
+                  color: pathname === href ? 'var(--navbar-activeLink)' : 'var(--navbar-text)',
+                }}
+              >
+                <span className="relative">
+                  {label}
+                  <span
+                    className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300"
+                    style={{
+                      backgroundColor: 'var(--navbar-hoverLink)',
+                      width: pathname === href ? '100%' : '0',
+                    }}
+                  />
+                </span>
+              </Link>
+            ))}
             {userName && (
-              <a 
+              <Link 
                 href="/personalize" 
-                className="ml-6 px-4 py-2 rounded-lg border border-[#00E6E6]/30 
-                         text-[#00E6E6] hover:bg-[#00E6E6]/10 transition-all duration-300"
+                className="ml-6 px-4 py-2 rounded-lg border transition-all duration-300"
+                style={{
+                  borderColor: 'var(--interactive-hover)',
+                  color: 'var(--text-accent)',
+                  backgroundColor: pathname === '/personalize' 
+                    ? 'var(--interactive-hover)10' 
+                    : 'transparent',
+                }}
               >
                 Personalize your experience, {userName}
-              </a>
+              </Link>
             )}
           </div>
         </div>
