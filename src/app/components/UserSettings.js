@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useProgress } from '@/app/contexts/ProgressContext'
 import ProgressBar from '@/app/components/ProgressBar'
 import CountrySelector from '@/app/components/CountrySelector'
+import Laptop from '@/app/components/Laptop'
 
 const lessonTitles = {
   '1': 'Introduction to Python',
@@ -94,9 +95,9 @@ export default function UserSettings({ onClose }) {
   const { completedLessons, totalLessons, averagePercentage } = calculateOverallProgress()
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 p-4 overflow-y-auto">
       <div 
-        className="bg-opacity-95 rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+        className="bg-opacity-95 rounded-lg p-8 w-full max-w-2xl my-4"
         style={{ backgroundColor: 'var(--color-background)' }}
       >
         <div className="flex justify-between items-center mb-6">
@@ -175,7 +176,7 @@ export default function UserSettings({ onClose }) {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
-              Delete All Data
+              Delete All Data kljdlkfjsld
             </button>
           </div>
 
@@ -194,6 +195,17 @@ export default function UserSettings({ onClose }) {
                 </span>
               </div>
               <ProgressBar percentage={averagePercentage} height="12px" />
+            </div>
+
+            {/* Interactive Laptop Progress */}
+            <div className="mb-8 flex flex-col items-center bg-opacity-50 rounded-lg p-4" style={{ backgroundColor: 'var(--card-background)' }}>
+              <div className="text-center mb-2" style={{ color: 'var(--text-primary)' }}>
+                Build your CompLing laptop as you progress!
+              </div>
+              <Laptop 
+                color={averagePercentage >= 50 ? 'space' : 'silver'} 
+                initialProgress={Math.floor(averagePercentage)} 
+              />
             </div>
 
             {/* Individual Lesson Progress */}

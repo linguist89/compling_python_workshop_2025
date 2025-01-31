@@ -30,16 +30,12 @@ export function ProgressProvider({ children }) {
         }
       };
 
-      // Calculate total progress for the lesson
-      const totalSections = prev.totalProgress[lessonId]?.total || 0;
-      const completedCount = Object.keys(newProgress.completedSections[lessonId] || {}).length;
-      
+      // Store total sections per lesson in totalProgress
       newProgress.totalProgress = {
         ...prev.totalProgress,
         [lessonId]: {
-          total: totalSections,
-          completed: completedCount,
-          percentage: totalSections > 0 ? (completedCount / totalSections) * 100 : 0
+          total: prev.totalProgress[lessonId]?.total || 0,
+          completed: Object.keys(newProgress.completedSections[lessonId] || {}).length
         }
       };
 
@@ -58,8 +54,7 @@ export function ProgressProvider({ children }) {
           ...prev.totalProgress,
           [lessonId]: {
             total,
-            completed: completedCount,
-            percentage: (completedCount / total) * 100
+            completed: completedCount
           }
         }
       };
@@ -71,7 +66,7 @@ export function ProgressProvider({ children }) {
   const getProgress = (lessonId) => {
     return {
       completedSections: progress.completedSections[lessonId] || {},
-      totalProgress: progress.totalProgress[lessonId] || { total: 0, completed: 0, percentage: 0 }
+      totalProgress: progress.totalProgress[lessonId] || { total: 0, completed: 0 }
     };
   };
 
@@ -80,14 +75,26 @@ export function ProgressProvider({ children }) {
   };
 
   const resetProgress = () => {
-    // Reset the progress state to initial values
     const initialProgress = {
       completedSections: {},
       totalProgress: {},
     };
     setProgress(initialProgress);
-    // Remove progress from localStorage
     localStorage.removeItem('lessonProgress');
+  };
+
+  const getOverallProgress = () => {
+    let totalSections = 0;
+    let completedSections = 0;
+
+    // Sum up all sections and completed sections across all lessons
+    Object.values(progress.totalProgress).forEach(lessonProgress => {
+      totalSections += lessonProgress.total;
+      completedSections += lessonProgress.completed;
+    });
+
+    // Calculate overall percentage
+    return totalSections > 0 ? Math.floor((completedSections / totalSections) * 100) : 0;
   };
 
   return (
@@ -96,7 +103,8 @@ export function ProgressProvider({ children }) {
       setTotalSections,
       getProgress,
       getAllProgress,
-      resetProgress
+      resetProgress,
+      getOverallProgress
     }}>
       {children}
     </ProgressContext.Provider>

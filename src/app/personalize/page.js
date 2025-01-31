@@ -1,15 +1,23 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useTheme } from '@/components/ThemeProvider'
+import { useTheme } from '@/app/contexts/ThemeContext'
 import { useProgress } from '@/app/contexts/ProgressContext'
 import CountrySelector from '@/app/components/CountrySelector'
 import UserNameWithFlag from '@/app/components/UserNameWithFlag'
 import FlagRain from '@/app/components/FlagRain'
 import Flag from 'react-world-flags'
+import Laptop from '@/app/components/Laptop'
+import ProgressBar from '@/app/components/ProgressBar'
 
 const DEFAULT_FONT_SIZE = 16
 const DEFAULT_THEME = 'neon'
+
+const lessonTitles = {
+  '1': 'Introduction to Python',
+  '2': 'Flow Control',
+  '3': 'Pandas and Matplotlib'
+}
 
 export default function PersonalizePage() {
   const [userName, setUserName] = useState('')
@@ -95,11 +103,29 @@ export default function PersonalizePage() {
     
     // Reset theme
     updateTheme(DEFAULT_THEME)
-    
-    // Reset username (optional - uncomment if you want to reset this too)
-    // localStorage.removeItem('userName')
-    // setUserName('')
   }
+
+  const calculateOverallProgress = () => {
+    const totalLessons = Object.keys(lessonTitles).length
+    let completedLessons = 0
+    let totalPercentage = 0
+
+    Object.keys(allProgress.totalProgress).forEach(lessonId => {
+      const progress = allProgress.totalProgress[lessonId]
+      totalPercentage += progress.percentage
+      if (progress.percentage === 100) {
+        completedLessons++
+      }
+    })
+
+    return {
+      completedLessons,
+      totalLessons,
+      averagePercentage: totalPercentage / totalLessons
+    }
+  }
+
+  const { completedLessons, totalLessons, averagePercentage } = calculateOverallProgress()
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -317,6 +343,63 @@ export default function PersonalizePage() {
                 </code>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Progress Overview */}
+        <section 
+          style={{ 
+            backgroundColor: 'var(--card-background)',
+            borderColor: 'var(--card-border)',
+            boxShadow: 'var(--card-shadow)'
+          }} 
+          className="rounded-lg p-6 border transition-all duration-300"
+        >
+          <h2 
+            className="text-2xl font-semibold mb-6"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Your Progress
+          </h2>
+
+          {/* Overall Progress */}
+          <div className="mb-6">
+            <div className="flex justify-between mb-2">
+              <span style={{ color: 'var(--text-primary)' }}>Overall Progress{' '}</span>
+              <span style={{ color: 'var(--text-secondary)' }}>
+                {completedLessons} of {totalLessons} lessons completed
+              </span>
+            </div>
+            <ProgressBar percentage={averagePercentage} height="12px" />
+          </div>
+
+          {/* Interactive Laptop Progress */}
+          <div className="mb-8 flex flex-col items-center bg-opacity-50 rounded-lg p-4" style={{ backgroundColor: 'var(--card-background)' }}>
+            <div className="text-center mb-2" style={{ color: 'var(--text-primary)' }}>
+              Build your CompLing laptop as you progress!
+            </div>
+            <Laptop 
+              color={averagePercentage >= 50 ? 'space' : 'silver'} 
+              initialProgress={Math.floor(averagePercentage)} 
+            />
+          </div>
+
+          {/* Individual Lesson Progress */}
+          <div className="space-y-4">
+            {Object.entries(lessonTitles).map(([id, title]) => {
+              const progress = allProgress.totalProgress[id] || { percentage: 0, completed: 0, total: 0 }
+              return (
+                <div key={id} className="p-4 rounded-lg" style={{ backgroundColor: 'var(--card-background)' }}>
+                  <div className="flex justify-between mb-2">
+                    <span style={{ color: 'var(--text-primary)' }}>{title}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>
+                      {progress.completed} of {progress.total} sections
+                    </span>
+                  </div>
+                  <ProgressBar percentage={progress.percentage} />
+                </div>
+              )
+            })}
           </div>
         </section>
 

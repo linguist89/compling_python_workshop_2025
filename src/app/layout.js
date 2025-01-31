@@ -1,10 +1,10 @@
 import './globals.css'
 import { Inter, Fira_Code } from 'next/font/google'
-import WelcomePopup from '@/components/WelcomePopup'
-import Welcome from '@/components/Welcome'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
-import ThemeProvider from '@/components/ThemeProvider'
+import WelcomePopup from '@/app/components/WelcomePopup'
+import Welcome from '@/app/components/Welcome'
+import Navbar from '@/app/components/Navbar'
+import Footer from '@/app/components/Footer'
+import ThemeProvider from '@/app/contexts/ThemeContext'
 import { ProgressProvider } from './contexts/ProgressContext'
 
 const inter = Inter({ subsets: ['latin'] })
