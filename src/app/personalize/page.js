@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useTheme } from '@/components/ThemeProvider'
+import { useProgress } from '@/app/contexts/ProgressContext'
+import CountrySelector from '@/app/components/CountrySelector'
 
 const DEFAULT_FONT_SIZE = 16
 const DEFAULT_THEME = 'neon'
@@ -9,11 +11,17 @@ const DEFAULT_THEME = 'neon'
 export default function PersonalizePage() {
   const [userName, setUserName] = useState('')
   const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE)
+  const [selectedCountry, setSelectedCountry] = useState(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [confirmName, setConfirmName] = useState('')
   const { themes, currentTheme, updateTheme } = useTheme()
+  const { getAllProgress, resetProgress } = useProgress()
+  const allProgress = getAllProgress()
 
   useEffect(() => {
     const savedName = localStorage.getItem('userName')
     const savedFontSize = localStorage.getItem('fontSize')
+    const savedCountry = localStorage.getItem('userCountry')
     if (savedName) {
       setUserName(savedName)
     }
@@ -21,7 +29,47 @@ export default function PersonalizePage() {
       setFontSize(parseInt(savedFontSize))
       document.documentElement.style.fontSize = `${savedFontSize}px`
     }
+    if (savedCountry) {
+      setSelectedCountry(JSON.parse(savedCountry))
+    }
   }, [])
+
+  const handleNameChange = (e) => {
+    const newName = e.target.value
+    setUserName(newName)
+    localStorage.setItem('userName', newName)
+  }
+
+  const handleCountrySelect = (country) => {
+    setSelectedCountry(country)
+    localStorage.setItem('userCountry', JSON.stringify(country))
+  }
+
+  const handleDeleteData = () => {
+    setShowDeleteConfirm(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (confirmName === userName) {
+      // Reset all data
+      localStorage.removeItem('userName')
+      localStorage.removeItem('fontSize')
+      localStorage.removeItem('userCountry')
+      resetProgress()
+      
+      // Reset states
+      setUserName('')
+      setFontSize(DEFAULT_FONT_SIZE)
+      setSelectedCountry(null)
+      setShowDeleteConfirm(false)
+      setConfirmName('')
+      
+      // Reset font size to default
+      document.documentElement.style.fontSize = `${DEFAULT_FONT_SIZE}px`
+      // Reset theme
+      updateTheme(DEFAULT_THEME)
+    }
+  }
 
   const handleThemeChange = (themeKey) => {
     updateTheme(themeKey)
@@ -58,10 +106,70 @@ export default function PersonalizePage() {
           WebkitTextFillColor: 'transparent'
         }}
       >
-        Personalize Your Experience, {userName}!
+        Personalize Your Experience{userName ? `, ${userName}` : ''}!
       </h1>
 
       <div className="space-y-8">
+        {/* User Information Section */}
+        <section 
+          style={{ 
+            backgroundColor: 'var(--card-background)',
+            borderColor: 'var(--card-border)',
+            boxShadow: 'var(--card-shadow)'
+          }} 
+          className="rounded-lg p-6 border transition-all duration-300"
+        >
+          <h2 
+            className="text-2xl font-semibold mb-6"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Your Information
+          </h2>
+          <div className="space-y-6">
+            <div>
+              <label className="block mb-2 font-medium" style={{ color: 'var(--text-primary)' }}>
+                Your Name
+              </label>
+              <input
+                type="text"
+                value={userName}
+                onChange={handleNameChange}
+                className="w-full px-4 py-2 rounded-lg"
+                style={{
+                  backgroundColor: 'var(--card-background)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--card-border)'
+                }}
+                placeholder="Enter your name"
+              />
+            </div>
+
+            <CountrySelector
+              selectedCountry={selectedCountry}
+              onSelect={handleCountrySelect}
+            />
+
+            {/* Delete Data Section */}
+            <div className="border-t pt-6 mt-6" style={{ borderColor: 'var(--card-border)' }}>
+              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Danger Zone
+              </h3>
+              <p className="mb-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                This action will permanently delete all your data, including progress, settings, and preferences.
+              </p>
+              <button
+                onClick={handleDeleteData}
+                className="w-full px-4 py-3 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                Delete All Data
+              </button>
+            </div>
+          </div>
+        </section>
+
         {/* Theme Selection */}
         <section 
           style={{ 
@@ -209,6 +317,56 @@ export default function PersonalizePage() {
             Reset to Defaults
           </button>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div 
+              className="bg-opacity-95 rounded-lg p-6 max-w-md w-full mx-4"
+              style={{ backgroundColor: 'var(--color-background)' }}
+            >
+              <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Confirm Data Deletion
+              </h3>
+              <p className="mb-4" style={{ color: 'var(--text-primary)' }}>
+                This action will delete all your data including progress, settings, and preferences. 
+                To confirm, please type your name: <strong>{userName}</strong>
+              </p>
+              <input
+                type="text"
+                value={confirmName}
+                onChange={(e) => setConfirmName(e.target.value)}
+                className="w-full px-4 py-2 mb-4 rounded-lg"
+                style={{
+                  backgroundColor: 'var(--card-background)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--card-border)'
+                }}
+                placeholder="Type your name to confirm"
+              />
+              <div className="flex gap-4">
+                <button
+                  onClick={handleConfirmDelete}
+                  className={`flex-1 px-4 py-2 text-white rounded-lg transition-colors ${
+                    confirmName === userName ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400 cursor-not-allowed'
+                  }`}
+                  disabled={confirmName !== userName}
+                >
+                  Delete All Data
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false)
+                    setConfirmName('')
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
