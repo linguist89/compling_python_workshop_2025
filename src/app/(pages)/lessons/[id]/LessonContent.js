@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { useProgress } from '@/app/contexts/ProgressContext'
+import ProgressBar from '@/app/components/ProgressBar'
 
 const lessonTitles = {
   '1': 'Introduction to Python',
@@ -12,12 +14,47 @@ const lessonTitles = {
   '3': 'Pandas and Matplotlib'
 }
 
+const Section = ({ children, onComplete, isCompleted }) => (
+  <div className="mb-12 p-6 rounded-lg bg-opacity-5 relative" style={{ 
+    backgroundColor: 'var(--card-background)',
+    border: '1px solid var(--card-border)',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+  }}>
+    {children}
+    <div className="mt-6 flex justify-end">
+      <button
+        onClick={onComplete}
+        disabled={isCompleted}
+        className="px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2"
+        style={{
+          backgroundColor: isCompleted ? 'var(--text-secondary)' : 'var(--text-accent)',
+          color: 'white',
+          opacity: isCompleted ? 0.7 : 1
+        }}
+      >
+        {isCompleted ? (
+          <>
+            <span>Completed</span>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          </>
+        ) : (
+          <span>Mark as Complete</span>
+        )}
+      </button>
+    </div>
+  </div>
+);
+
 export default function LessonContent({ content, lessonId }) {
   const [userName, setUserName] = useState('')
   const router = useRouter()
   const currentLessonId = parseInt(lessonId)
   const maxLessonId = Object.keys(lessonTitles).length
   const hasNextLesson = currentLessonId < maxLessonId
+  const { markSectionComplete, setTotalSections, getProgress } = useProgress()
+  const { completedSections, totalProgress } = getProgress(lessonId)
 
   useEffect(() => {
     const savedName = localStorage.getItem('userName')
@@ -31,6 +68,112 @@ export default function LessonContent({ content, lessonId }) {
       router.push(`/lessons/${currentLessonId + 1}`)
     }
   }
+
+  // Split content into sections based on ## headings
+  const processContent = (content) => {
+    // First, find the main heading and introduction
+    const [mainSection, ...restContent] = content.split('\n# ');
+    const mainContent = restContent[0] || mainSection; // If no # found, use entire content
+    
+    // Then split the rest by ##
+    const sections = mainContent.split('\n## ');
+    const introduction = sections[0];
+    const subsections = sections.slice(1);
+    
+    // Set total sections count (only counting subsections)
+    useEffect(() => {
+      setTotalSections(lessonId, subsections.length);
+    }, []);
+
+    return (
+      <>
+        <div className="mb-8">
+          <ProgressBar percentage={totalProgress.percentage} height="12px" />
+          <div className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+            {totalProgress.completed} of {totalProgress.total} sections completed ({Math.round(totalProgress.percentage)}%)
+          </div>
+        </div>
+
+        {/* Main introduction section without completion button */}
+        <div className="mb-12">
+          <ReactMarkdown
+            components={{
+              code({node, inline, className, children, ...props}) {
+                const match = /language-(\w+)/.exec(className || '')
+                return !inline && match ? (
+                  <div className="rounded-lg overflow-hidden">
+                    <SyntaxHighlighter
+                      {...props}
+                      children={String(children).replace(/\n$/, '')}
+                      style={atomDark}
+                      language={match[1]}
+                      PreTag="div"
+                    />
+                  </div>
+                ) : (
+                  <code
+                    {...props}
+                    className={className}
+                    style={{
+                      backgroundColor: 'var(--card-background)',
+                      padding: '0.2em 0.4em',
+                      borderRadius: '0.25em',
+                    }}
+                  >
+                    {children}
+                  </code>
+                )
+              }
+            }}
+          >
+            {introduction}
+          </ReactMarkdown>
+        </div>
+        
+        {/* Subsections with completion buttons */}
+        {subsections.map((section, index) => (
+          <Section 
+            key={index}
+            onComplete={() => markSectionComplete(lessonId, index)}
+            isCompleted={completedSections[index]}
+          >
+            <ReactMarkdown
+              components={{
+                code({node, inline, className, children, ...props}) {
+                  const match = /language-(\w+)/.exec(className || '')
+                  return !inline && match ? (
+                    <div className="rounded-lg overflow-hidden">
+                      <SyntaxHighlighter
+                        {...props}
+                        children={String(children).replace(/\n$/, '')}
+                        style={atomDark}
+                        language={match[1]}
+                        PreTag="div"
+                      />
+                    </div>
+                  ) : (
+                    <code
+                      {...props}
+                      className={className}
+                      style={{
+                        backgroundColor: 'var(--card-background)',
+                        padding: '0.2em 0.4em',
+                        borderRadius: '0.25em',
+                      }}
+                    >
+                      {children}
+                    </code>
+                  )
+                }
+              }}
+            >
+              {`## ${section}`}
+            </ReactMarkdown>
+          </Section>
+        ))}
+      </>
+    );
+  };
 
   return (
     <div className="min-h-screen">
@@ -78,39 +221,7 @@ export default function LessonContent({ content, lessonId }) {
               '--tw-prose-td-borders': 'var(--card-border)'
             }}
           >
-            <ReactMarkdown
-              components={{
-                code({node, inline, className, children, ...props}) {
-                  const match = /language-(\w+)/.exec(className || '')
-                  return !inline && match ? (
-                    <div className="rounded-lg overflow-hidden">
-                      <SyntaxHighlighter
-                        {...props}
-                        children={String(children).replace(/\n$/, '')}
-                        style={atomDark}
-                        language={match[1]}
-                        PreTag="div"
-                      />
-                    </div>
-                  ) : (
-                    <code
-                      {...props}
-                      className={className}
-                      style={{
-                        backgroundColor: 'var(--card-background)',
-                        padding: '0.2em 0.4em',
-                        borderRadius: '0.25rem',
-                        fontSize: '0.875em'
-                      }}
-                    >
-                      {children}
-                    </code>
-                  )
-                }
-              }}
-            >
-              {content}
-            </ReactMarkdown>
+            {processContent(content)}
           </article>
 
           {/* Navigation */}
