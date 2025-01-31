@@ -3,36 +3,120 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #4A90E2;
-  --color-secondary: #F5F5F5;
-  --color-accent: #FFA726;
+  --color-primary: #0A192F;
+  --color-secondary: #00E6E6;
+  --color-accent: #FFC107;
+  --color-dark: #050B18;
+  --color-light: #E6FFFF;
 }
 
 @layer base {
   body {
-    @apply bg-secondary text-gray-900;
+    @apply bg-gradient-to-br from-[#0A192F] to-[#050B18] text-[#E6FFFF] min-h-screen;
     font-family: 'Inter', sans-serif;
   }
   
   code {
     font-family: 'Fira Code', 'Courier New', monospace;
+    @apply bg-[#112240] rounded-lg p-4 my-4 border border-[#00E6E6]/20;
+  }
+
+  /* Smooth scrolling and selection styles */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    @apply bg-[#00E6E6]/30 text-[#E6FFFF];
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors;
+    @apply bg-[#00E6E6] text-[#0A192F] px-6 py-2 rounded-lg 
+           hover:bg-[#00E6E6]/90 transition-all duration-300 
+           hover:shadow-[0_0_15px_rgba(0,230,230,0.5)] font-medium;
   }
   
   .btn-secondary {
-    @apply bg-secondary text-gray-900 px-6 py-2 rounded-lg hover:bg-secondary/90 transition-colors;
+    @apply bg-transparent text-[#00E6E6] px-6 py-2 rounded-lg 
+           border border-[#00E6E6] hover:bg-[#00E6E6]/10 
+           transition-all duration-300 font-medium;
   }
   
   .btn-accent {
-    @apply bg-accent text-white px-6 py-2 rounded-lg hover:bg-accent/90 transition-colors;
+    @apply bg-[#FFC107] text-[#0A192F] px-6 py-2 rounded-lg 
+           hover:bg-[#FFC107]/90 transition-all duration-300 
+           hover:shadow-[0_0_15px_rgba(255,193,7,0.5)] font-medium;
   }
   
   .container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Card and section styles */
+  .tech-card {
+    @apply bg-gradient-to-br from-[#112240] to-[#0A192F] 
+           p-6 rounded-xl border border-[#00E6E6]/20
+           hover:border-[#00E6E6]/50 transition-all duration-300
+           hover:shadow-[0_0_30px_rgba(0,230,230,0.1)];
+  }
+
+  /* Heading styles */
+  .heading-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r 
+           from-[#00E6E6] to-[#FFC107] font-bold;
+  }
+
+  /* Code block styles */
+  .code-block {
+    @apply bg-[#112240] rounded-lg p-4 my-4 
+           border border-[#00E6E6]/20 relative
+           overflow-x-auto;
+  }
+
+  /* Link styles */
+  .neon-link {
+    @apply text-[#00E6E6] hover:text-[#FFC107] 
+           transition-all duration-300 relative
+           after:content-[''] after:absolute after:bottom-0 
+           after:left-0 after:w-0 after:h-[2px] 
+           after:bg-[#FFC107] after:transition-all 
+           hover:after:w-full;
+  }
+
+  /* Animation utilities */
+  .hover-glow {
+    @apply transition-all duration-300 
+           hover:shadow-[0_0_15px_rgba(0,230,230,0.3)];
+  }
+
+  .pulse {
+    @apply animate-pulse;
+  }
+
+  /* Grid and layout utilities */
+  .tech-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+}
+
+/* Custom animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #0A192F;
+    --color-secondary: #00E6E6;
+    --color-accent: #FFC107;
   }
 }
