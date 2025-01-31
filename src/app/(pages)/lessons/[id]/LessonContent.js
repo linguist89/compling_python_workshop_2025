@@ -191,12 +191,12 @@ export default function LessonContent({ content, lessonId }) {
             >
               {`${lessonId}. ${lessonTitles[lessonId]}`}
             </h1>
-            <p 
+            <div 
               className="text-lg"
               style={{ color: 'var(--text-secondary)' }}
             >
               Hi <UserNameWithFlag />! Here are your Python lessons for today.
-            </p>
+            </div>
           </header>
 
           <article 

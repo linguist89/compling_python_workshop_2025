@@ -20,12 +20,12 @@ export default function UserNameWithFlag({ className = '' }) {
     <span className={`flex items-center gap-2 ${className}`}>
       <span>{userName}</span>
       {selectedCountry && (
-        <div className="w-6 h-4 relative overflow-hidden">
+        <span className="w-6 h-4 relative overflow-hidden inline-block">
           <Flag 
             code={selectedCountry.code} 
             className="absolute inset-0 w-full h-full object-cover"
           />
-        </div>
+        </span>
       )}
     </span>
   )
