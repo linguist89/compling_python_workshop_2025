@@ -5,96 +5,55 @@ const ProgressContext = createContext();
 
 export function ProgressProvider({ children }) {
   const [progress, setProgress] = useState({
-    completedSections: {},
-    totalProgress: {},
+    completedSections: 0,
+    totalSections: 0,
   });
 
   useEffect(() => {
     // Load progress from localStorage on mount
-    const savedProgress = localStorage.getItem('lessonProgress');
+    const savedProgress = localStorage.getItem('progress');
     if (savedProgress) {
       setProgress(JSON.parse(savedProgress));
     }
   }, []);
 
-  const markSectionComplete = (lessonId, sectionIndex) => {
+  const markSectionComplete = () => {
     setProgress(prev => {
       const newProgress = {
         ...prev,
-        completedSections: {
-          ...prev.completedSections,
-          [lessonId]: {
-            ...(prev.completedSections[lessonId] || {}),
-            [sectionIndex]: true
-          }
-        }
+        completedSections: prev.completedSections + 1
       };
-
-      // Store total sections per lesson in totalProgress
-      newProgress.totalProgress = {
-        ...prev.totalProgress,
-        [lessonId]: {
-          total: prev.totalProgress[lessonId]?.total || 0,
-          completed: Object.keys(newProgress.completedSections[lessonId] || {}).length
-        }
-      };
-
-      // Save to localStorage
-      localStorage.setItem('lessonProgress', JSON.stringify(newProgress));
+      localStorage.setItem('progress', JSON.stringify(newProgress));
       return newProgress;
     });
   };
 
-  const setTotalSections = (lessonId, total) => {
+  const setTotalSections = (total) => {
     setProgress(prev => {
-      const completedCount = Object.keys(prev.completedSections[lessonId] || {}).length;
+      // Add to the existing total sections count
       const newProgress = {
         ...prev,
-        totalProgress: {
-          ...prev.totalProgress,
-          [lessonId]: {
-            total,
-            completed: completedCount
-          }
-        }
+        totalSections: prev.totalSections + total
       };
-      localStorage.setItem('lessonProgress', JSON.stringify(newProgress));
+      localStorage.setItem('progress', JSON.stringify(newProgress));
       return newProgress;
     });
   };
 
-  const getProgress = (lessonId) => {
-    return {
-      completedSections: progress.completedSections[lessonId] || {},
-      totalProgress: progress.totalProgress[lessonId] || { total: 0, completed: 0 }
-    };
-  };
-
-  const getAllProgress = () => {
-    return progress;
+  const getProgress = () => {
+    // Calculate percentage based on completed sections out of total sections
+    return progress.totalSections > 0 
+      ? Math.floor((progress.completedSections / progress.totalSections) * 100)
+      : 0;
   };
 
   const resetProgress = () => {
     const initialProgress = {
-      completedSections: {},
-      totalProgress: {},
+      completedSections: 0,
+      totalSections: 0,
     };
     setProgress(initialProgress);
-    localStorage.removeItem('lessonProgress');
-  };
-
-  const getOverallProgress = () => {
-    let totalSections = 0;
-    let completedSections = 0;
-
-    // Sum up all sections and completed sections across all lessons
-    Object.values(progress.totalProgress).forEach(lessonProgress => {
-      totalSections += lessonProgress.total;
-      completedSections += lessonProgress.completed;
-    });
-
-    // Calculate overall percentage
-    return totalSections > 0 ? Math.floor((completedSections / totalSections) * 100) : 0;
+    localStorage.removeItem('progress');
   };
 
   return (
@@ -102,9 +61,7 @@ export function ProgressProvider({ children }) {
       markSectionComplete,
       setTotalSections,
       getProgress,
-      getAllProgress,
       resetProgress,
-      getOverallProgress
     }}>
       {children}
     </ProgressContext.Provider>

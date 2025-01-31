@@ -9,6 +9,7 @@ import FlagRain from '@/app/components/FlagRain'
 import Flag from 'react-world-flags'
 import Laptop from '@/app/components/Laptop'
 import ProgressBar from '@/app/components/ProgressBar'
+import { useRouter } from 'next/navigation'
 
 const DEFAULT_FONT_SIZE = 16
 const DEFAULT_THEME = 'neon'
@@ -27,8 +28,9 @@ export default function PersonalizePage() {
   const [confirmName, setConfirmName] = useState('')
   const [showFlagRain, setShowFlagRain] = useState(false)
   const { themes, currentTheme, updateTheme } = useTheme()
-  const { getAllProgress, resetProgress } = useProgress()
-  const allProgress = getAllProgress()
+  const { resetProgress, getProgress } = useProgress()
+  const progress = getProgress()
+  const router = useRouter()
 
   useEffect(() => {
     const savedName = localStorage.getItem('userName')
@@ -81,6 +83,12 @@ export default function PersonalizePage() {
       document.documentElement.style.fontSize = `${DEFAULT_FONT_SIZE}px`
       // Reset theme
       updateTheme(DEFAULT_THEME)
+
+      // Navigate to home and refresh
+      router.push('/')
+      setTimeout(() => {
+        window.location.reload()
+      }, 100)
     }
   }
 
@@ -106,22 +114,10 @@ export default function PersonalizePage() {
   }
 
   const calculateOverallProgress = () => {
-    const totalLessons = Object.keys(lessonTitles).length
-    let completedLessons = 0
-    let totalPercentage = 0
-
-    Object.keys(allProgress.totalProgress).forEach(lessonId => {
-      const progress = allProgress.totalProgress[lessonId]
-      totalPercentage += progress.percentage
-      if (progress.percentage === 100) {
-        completedLessons++
-      }
-    })
-
     return {
-      completedLessons,
-      totalLessons,
-      averagePercentage: totalPercentage / totalLessons
+      completedLessons: Math.floor(progress / (100 / Object.keys(lessonTitles).length)),
+      totalLessons: Object.keys(lessonTitles).length,
+      averagePercentage: progress
     }
   }
 
@@ -387,16 +383,16 @@ export default function PersonalizePage() {
           {/* Individual Lesson Progress */}
           <div className="space-y-4">
             {Object.entries(lessonTitles).map(([id, title]) => {
-              const progress = allProgress.totalProgress[id] || { percentage: 0, completed: 0, total: 0 }
+              const lessonProgress = Math.min(progress, 100)
               return (
                 <div key={id} className="p-4 rounded-lg" style={{ backgroundColor: 'var(--card-background)' }}>
                   <div className="flex justify-between mb-2">
                     <span style={{ color: 'var(--text-primary)' }}>{title}</span>
                     <span style={{ color: 'var(--text-secondary)' }}>
-                      {progress.completed} of {progress.total} sections
+                      Overall Progress
                     </span>
                   </div>
-                  <ProgressBar percentage={progress.percentage} />
+                  <ProgressBar percentage={lessonProgress} />
                 </div>
               )
             })}

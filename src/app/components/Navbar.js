@@ -8,8 +8,8 @@ import { useProgress } from '../contexts/ProgressContext'
 
 export default function Navbar() {
   const pathname = usePathname()
-  const { getOverallProgress } = useProgress()
-  const progress = getOverallProgress()
+  const { getProgress } = useProgress()
+  const progress = getProgress()
 
   return (
     <nav 

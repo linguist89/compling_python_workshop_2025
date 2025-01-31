@@ -8,6 +8,7 @@ import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { useProgress } from '@/app/contexts/ProgressContext'
 import ProgressBar from '@/app/components/ProgressBar'
 import UserNameWithFlag from '@/app/components/UserNameWithFlag'
+import LaptopPopup from '@/app/components/LaptopPopup'
 
 const lessonTitles = {
   '1': 'Introduction to Python',
@@ -50,12 +51,14 @@ const Section = ({ children, onComplete, isCompleted }) => (
 
 export default function LessonContent({ content, lessonId }) {
   const [userName, setUserName] = useState('')
+  const [showPopup, setShowPopup] = useState(false)
+  const [completedSections, setCompletedSections] = useState({})
   const router = useRouter()
   const currentLessonId = parseInt(lessonId)
   const maxLessonId = Object.keys(lessonTitles).length
   const hasNextLesson = currentLessonId < maxLessonId
   const { markSectionComplete, setTotalSections, getProgress } = useProgress()
-  const { completedSections, totalProgress } = getProgress(lessonId)
+  const progress = getProgress()
 
   useEffect(() => {
     const savedName = localStorage.getItem('userName')
@@ -68,6 +71,15 @@ export default function LessonContent({ content, lessonId }) {
     if (hasNextLesson) {
       router.push(`/lessons/${currentLessonId + 1}`)
     }
+  }
+
+  const handleSectionComplete = (index) => {
+    markSectionComplete()
+    setCompletedSections(prev => ({
+      ...prev,
+      [index]: true
+    }))
+    setShowPopup(true)
   }
 
   // Split content into sections based on ## headings
@@ -83,15 +95,15 @@ export default function LessonContent({ content, lessonId }) {
     
     // Set total sections count (only counting subsections)
     useEffect(() => {
-      setTotalSections(lessonId, subsections.length);
+      setTotalSections(subsections.length);
     }, []);
 
     return (
       <>
         <div className="mb-8">
-          <ProgressBar percentage={totalProgress.percentage} height="12px" />
+          <ProgressBar percentage={progress} height="12px" />
           <div className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-            {totalProgress.completed} of {totalProgress.total} sections completed ({Math.round(totalProgress.percentage)}%)
+            Overall Progress: {progress}%
           </div>
         </div>
 
@@ -135,7 +147,7 @@ export default function LessonContent({ content, lessonId }) {
         {subsections.map((section, index) => (
           <Section 
             key={index}
-            onComplete={() => markSectionComplete(lessonId, index)}
+            onComplete={() => handleSectionComplete(index)}
             isCompleted={completedSections[index]}
           >
             <ReactMarkdown
@@ -178,6 +190,11 @@ export default function LessonContent({ content, lessonId }) {
 
   return (
     <div className="min-h-screen">
+      <LaptopPopup 
+        show={showPopup}
+        progress={progress}
+        onClose={() => setShowPopup(false)}
+      />
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
           <header className="mb-12">
