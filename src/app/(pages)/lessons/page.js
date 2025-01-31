@@ -48,7 +48,7 @@ export default function LessonsIndex() {
                     className="text-xl font-semibold"
                     style={{ color: 'var(--text-primary)' }}
                   >
-                    {`${lesson.id}. ${lessonTitles[lesson.id]}`}
+                    {`${lesson.id}. ${lesson.title}`}
                   </h2>
                 </Link>
               ))}
