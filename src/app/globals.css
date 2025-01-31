@@ -112,6 +112,22 @@
   animation: float 3s ease-in-out infinite;
 }
 
+@keyframes fall {
+  0% {
+    transform: translateY(-100%) rotate(var(--rotation));
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(calc(var(--rotation) + 360deg));
+    opacity: 0;
+  }
+}
+
+.animate-fall {
+  animation: fall 3s linear forwards;
+  --rotation: 0deg;
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   :root {

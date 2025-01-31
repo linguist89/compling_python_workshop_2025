@@ -79,12 +79,24 @@ export function ProgressProvider({ children }) {
     return progress;
   };
 
+  const resetProgress = () => {
+    // Reset the progress state to initial values
+    const initialProgress = {
+      completedSections: {},
+      totalProgress: {},
+    };
+    setProgress(initialProgress);
+    // Remove progress from localStorage
+    localStorage.removeItem('lessonProgress');
+  };
+
   return (
     <ProgressContext.Provider value={{
       markSectionComplete,
       setTotalSections,
       getProgress,
-      getAllProgress
+      getAllProgress,
+      resetProgress
     }}>
       {children}
     </ProgressContext.Provider>

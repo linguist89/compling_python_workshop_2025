@@ -18,20 +18,31 @@ export default function WelcomePopup() {
       setIsOpen(true)
     }
     if (savedCountry) {
-      setSelectedCountry(JSON.parse(savedCountry))
+      try {
+        setSelectedCountry(JSON.parse(savedCountry))
+      } catch (e) {
+        console.error('Error parsing saved country:', e)
+      }
+    }
+    if (savedName) {
+      setName(savedName)
     }
   }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
     if (name.trim() && selectedCountry) {
+      // First save to localStorage
       localStorage.setItem('userName', name.trim())
       localStorage.setItem('userCountry', JSON.stringify(selectedCountry))
+      
+      // Then show the animation
       setShowFlagRain(true)
-      // Close the popup after the flag rain animation
+      
+      // Close the popup after the animation (increased to 4 seconds)
       setTimeout(() => {
         setIsOpen(false)
-      }, 3000)
+      }, 4000)
     }
   }
 
@@ -43,6 +54,7 @@ export default function WelcomePopup() {
         <FlagRain
           countryCode={selectedCountry.code}
           onAnimationComplete={() => setShowFlagRain(false)}
+          userName={name}
         />
       )}
       <div 

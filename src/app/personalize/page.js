@@ -5,6 +5,7 @@ import { useTheme } from '@/components/ThemeProvider'
 import { useProgress } from '@/app/contexts/ProgressContext'
 import CountrySelector from '@/app/components/CountrySelector'
 import UserNameWithFlag from '@/app/components/UserNameWithFlag'
+import FlagRain from '@/app/components/FlagRain'
 import Flag from 'react-world-flags'
 
 const DEFAULT_FONT_SIZE = 16
@@ -16,6 +17,7 @@ export default function PersonalizePage() {
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [confirmName, setConfirmName] = useState('')
+  const [showFlagRain, setShowFlagRain] = useState(false)
   const { themes, currentTheme, updateTheme } = useTheme()
   const { getAllProgress, resetProgress } = useProgress()
   const allProgress = getAllProgress()
@@ -45,6 +47,7 @@ export default function PersonalizePage() {
   const handleCountrySelect = (country) => {
     setSelectedCountry(country)
     localStorage.setItem('userCountry', JSON.stringify(country))
+    setShowFlagRain(true)
   }
 
   const handleDeleteData = () => {
@@ -100,6 +103,12 @@ export default function PersonalizePage() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      {showFlagRain && selectedCountry && (
+        <FlagRain
+          countryCode={selectedCountry.code}
+          onAnimationComplete={() => setShowFlagRain(false)}
+        />
+      )}
       <h1 
         className="text-4xl font-bold mb-8 flex items-center gap-3"
         style={{
