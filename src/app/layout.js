@@ -13,11 +13,23 @@ const firaCode = Fira_Code({ subsets: ['latin'] })
 export const metadata = {
   title: 'Python CompLing Workshop 2025',
   description: 'Interactive Python Learning Hub for Computational Linguistics',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/logo.svg' }
+    ]
+  }
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
+      </head>
       <body className={`${inter.className} min-h-screen flex flex-col`}>
         <ThemeProvider>
           <ProgressProvider>

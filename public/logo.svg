@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="#0A192F"/>
+  
+  <!-- Code Brackets -->
+  <path d="M180 150L120 256L180 362" stroke="#00E6E6" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M332 150L392 256L332 362" stroke="#00E6E6" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Text Symbol (Sigma) -->
+  <path d="M220 160H320M220 352H320M220 160L270 256L220 352" stroke="#FFC107" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Binary Dots -->
+  <circle cx="256" cy="140" r="12" fill="#00E6E6"/>
+  <circle cx="256" cy="372" r="12" fill="#00E6E6"/>
+  <circle cx="196" cy="256" r="12" fill="#FFC107"/>
+  <circle cx="316" cy="256" r="12" fill="#FFC107"/>
+</svg> 
