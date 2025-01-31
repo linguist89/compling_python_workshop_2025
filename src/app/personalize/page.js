@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useTheme } from '@/components/ThemeProvider'
 import { useProgress } from '@/app/contexts/ProgressContext'
 import CountrySelector from '@/app/components/CountrySelector'
+import UserNameWithFlag from '@/app/components/UserNameWithFlag'
+import Flag from 'react-world-flags'
 
 const DEFAULT_FONT_SIZE = 16
 const DEFAULT_THEME = 'neon'
@@ -99,14 +101,21 @@ export default function PersonalizePage() {
   return (
     <div className="max-w-4xl mx-auto">
       <h1 
-        className="text-4xl font-bold mb-8"
+        className="text-4xl font-bold mb-8 flex items-center gap-3"
         style={{
           background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}
       >
-        Personalize Your Experience{userName ? `, ${userName}` : ''}!
+        Personalize Your Experience
+        {userName && (
+          <div className="flex items-center gap-2">
+            <span>,</span>
+            <UserNameWithFlag />
+            <span>!</span>
+          </div>
+        )}
       </h1>
 
       <div className="space-y-8">

@@ -7,6 +7,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { useProgress } from '@/app/contexts/ProgressContext'
 import ProgressBar from '@/app/components/ProgressBar'
+import UserNameWithFlag from '@/app/components/UserNameWithFlag'
 
 const lessonTitles = {
   '1': 'Introduction to Python',
@@ -190,14 +191,12 @@ export default function LessonContent({ content, lessonId }) {
             >
               {`${lessonId}. ${lessonTitles[lessonId]}`}
             </h1>
-            {userName && (
-              <p 
-                className="text-lg"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                Welcome to your lesson, {userName}! Let's learn something new.
-              </p>
-            )}
+            <p 
+              className="text-lg"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              Hi <UserNameWithFlag />! Here are your Python lessons for today.
+            </p>
           </header>
 
           <article 
