@@ -52,21 +52,50 @@ const Section = ({ children, onComplete, isCompleted }) => (
 export default function LessonContent({ content, lessonId }) {
   const [userName, setUserName] = useState('')
   const [showPopup, setShowPopup] = useState(false)
+  const [showCompletionPopup, setShowCompletionPopup] = useState(false)
   const [completedSections, setCompletedSections] = useState({})
+  const [processedContent, setProcessedContent] = useState({ introduction: '', subsections: [] })
   const router = useRouter()
   const currentLessonId = parseInt(lessonId)
   const maxLessonId = Object.keys(lessonTitles).length
   const hasNextLesson = currentLessonId < maxLessonId
-  const { markSectionComplete, setTotalSections, getProgress, getLessonProgress } = useProgress()
+  const { markSectionComplete, setTotalSections, getProgress, getLessonProgress, registerCompletionCallback, setProgress, resetProgress } = useProgress()
   const progress = getProgress()
   const lessonProgress = getLessonProgress(lessonId)
 
+  // Process content on mount or when content changes
+  useEffect(() => {
+    // First, find the main heading and introduction
+    const [mainSection, ...restContent] = content.split('\n# ');
+    const mainContent = restContent[0] || mainSection; // If no # found, use entire content
+    
+    // Then split the rest by ##
+    const sections = mainContent.split('\n## ');
+    const introduction = sections[0];
+    const subsections = sections.slice(1);
+    
+    setProcessedContent({ introduction, subsections });
+    
+    // Set total sections count (only counting subsections)
+    setTotalSections(lessonId, subsections.length);
+  }, [content, lessonId, setTotalSections]);
+
+  // Handle user name and completion callback
   useEffect(() => {
     const savedName = localStorage.getItem('userName')
     if (savedName) {
       setUserName(savedName)
     }
-  }, [])
+  }, []);
+
+  // Register completion callback
+  useEffect(() => {
+    const handleCompletion = () => {
+      setShowCompletionPopup(true);
+    };
+
+    registerCompletionCallback(handleCompletion);
+  }, [registerCompletionCallback]);
 
   const goToNextLesson = () => {
     if (hasNextLesson) {
@@ -83,124 +112,60 @@ export default function LessonContent({ content, lessonId }) {
     setShowPopup(true)
   }
 
-  // Split content into sections based on ## headings
-  const processContent = (content) => {
-    // First, find the main heading and introduction
-    const [mainSection, ...restContent] = content.split('\n# ');
-    const mainContent = restContent[0] || mainSection; // If no # found, use entire content
-    
-    // Then split the rest by ##
-    const sections = mainContent.split('\n## ');
-    const introduction = sections[0];
-    const subsections = sections.slice(1);
-    
-    // Set total sections count (only counting subsections)
-    useEffect(() => {
-      setTotalSections(lessonId, subsections.length);
-    }, []);
-
-    return (
-      <>
-        <div className="mb-8">
-          <div className="mb-4">
-            <div className="flex justify-between mb-2">
-              <span style={{ color: 'var(--text-primary)' }}>Lesson Progress</span>
-              <span style={{ color: 'var(--text-secondary)' }}>
-                {lessonProgress}%
-              </span>
+  const renderMarkdown = (content) => (
+    <ReactMarkdown
+      components={{
+        code({node, inline, className, children, ...props}) {
+          const match = /language-(\w+)/.exec(className || '')
+          return !inline && match ? (
+            <div className="rounded-lg overflow-hidden">
+              <SyntaxHighlighter
+                {...props}
+                children={String(children).replace(/\n$/, '')}
+                style={atomDark}
+                language={match[1]}
+                PreTag="div"
+              />
             </div>
-            <ProgressBar percentage={lessonProgress} height="8px" />
-          </div>
-          <div>
-            <div className="flex justify-between mb-2">
-              <span style={{ color: 'var(--text-primary)' }}>Overall Course Progress</span>
-              <span style={{ color: 'var(--text-secondary)' }}>
-                {progress}%
-              </span>
-            </div>
-            <ProgressBar percentage={progress} height="12px" />
-          </div>
-        </div>
-
-        {/* Main introduction section without completion button */}
-        <div className="mb-12">
-          <ReactMarkdown
-            components={{
-              code({node, inline, className, children, ...props}) {
-                const match = /language-(\w+)/.exec(className || '')
-                return !inline && match ? (
-                  <div className="rounded-lg overflow-hidden">
-                    <SyntaxHighlighter
-                      {...props}
-                      children={String(children).replace(/\n$/, '')}
-                      style={atomDark}
-                      language={match[1]}
-                      PreTag="div"
-                    />
-                  </div>
-                ) : (
-                  <code
-                    {...props}
-                    className={className}
-                    style={{
-                      backgroundColor: 'var(--card-background)',
-                      padding: '0.2em 0.4em',
-                      borderRadius: '0.25em',
-                    }}
-                  >
-                    {children}
-                  </code>
-                )
-              }
-            }}
-          >
-            {introduction}
-          </ReactMarkdown>
-        </div>
-        
-        {/* Subsections with completion buttons */}
-        {subsections.map((section, index) => (
-          <Section 
-            key={index}
-            onComplete={() => handleSectionComplete(index)}
-            isCompleted={completedSections[index]}
-          >
-            <ReactMarkdown
-              components={{
-                code({node, inline, className, children, ...props}) {
-                  const match = /language-(\w+)/.exec(className || '')
-                  return !inline && match ? (
-                    <div className="rounded-lg overflow-hidden">
-                      <SyntaxHighlighter
-                        {...props}
-                        children={String(children).replace(/\n$/, '')}
-                        style={atomDark}
-                        language={match[1]}
-                        PreTag="div"
-                      />
-                    </div>
-                  ) : (
-                    <code
-                      {...props}
-                      className={className}
-                      style={{
-                        backgroundColor: 'var(--card-background)',
-                        padding: '0.2em 0.4em',
-                        borderRadius: '0.25em',
-                      }}
-                    >
-                      {children}
-                    </code>
-                  )
-                }
+          ) : (
+            <code
+              {...props}
+              className={className}
+              style={{
+                backgroundColor: 'var(--card-background)',
+                padding: '0.2em 0.4em',
+                borderRadius: '0.25em',
               }}
             >
-              {`## ${section}`}
-            </ReactMarkdown>
-          </Section>
-        ))}
-      </>
-    );
+              {children}
+            </code>
+          )
+        }
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  )
+
+  // Add test functions to control progress
+  const setProgressTo100 = () => {
+    setProgress(prev => {
+      const newProgress = {
+        ...prev,
+        lessons: {
+          1: { completedSections: 10, totalSections: 10 },
+          2: { completedSections: 10, totalSections: 10 },
+          3: { completedSections: 10, totalSections: 10 }
+        },
+        hasReachedCompletion: false // Set to false to trigger completion celebration
+      };
+      localStorage.setItem('progress', JSON.stringify(newProgress));
+      return newProgress;
+    });
+  };
+
+  const setProgressTo0 = () => {
+    resetProgress();
   };
 
   return (
@@ -209,6 +174,11 @@ export default function LessonContent({ content, lessonId }) {
         show={showPopup}
         progress={progress}
         onClose={() => setShowPopup(false)}
+      />
+      <LaptopPopup 
+        show={showCompletionPopup}
+        progress={100}
+        onClose={() => setShowCompletionPopup(false)}
       />
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
@@ -252,7 +222,42 @@ export default function LessonContent({ content, lessonId }) {
               '--tw-prose-td-borders': 'var(--card-border)'
             }}
           >
-            {processContent(content)}
+            <div className="mb-8">
+              <div className="mb-4">
+                <div className="flex justify-between mb-2">
+                  <span style={{ color: 'var(--text-primary)' }}>Lesson Progress</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>
+                    {lessonProgress}%
+                  </span>
+                </div>
+                <ProgressBar percentage={lessonProgress} height="8px" />
+              </div>
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span style={{ color: 'var(--text-primary)' }}>Overall Course Progress</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>
+                    {progress}%
+                  </span>
+                </div>
+                <ProgressBar percentage={progress} height="12px" />
+              </div>
+            </div>
+
+            {/* Main introduction section without completion button */}
+            <div className="mb-12">
+              {renderMarkdown(processedContent.introduction)}
+            </div>
+            
+            {/* Subsections with completion buttons */}
+            {processedContent.subsections.map((section, index) => (
+              <Section 
+                key={index}
+                onComplete={() => handleSectionComplete(index)}
+                isCompleted={completedSections[index]}
+              >
+                {renderMarkdown(`## ${section}`)}
+              </Section>
+            ))}
           </article>
 
           {/* Navigation */}
