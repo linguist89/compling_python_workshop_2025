@@ -57,8 +57,9 @@ export default function LessonContent({ content, lessonId }) {
   const currentLessonId = parseInt(lessonId)
   const maxLessonId = Object.keys(lessonTitles).length
   const hasNextLesson = currentLessonId < maxLessonId
-  const { markSectionComplete, setTotalSections, getProgress } = useProgress()
+  const { markSectionComplete, setTotalSections, getProgress, getLessonProgress } = useProgress()
   const progress = getProgress()
+  const lessonProgress = getLessonProgress(lessonId)
 
   useEffect(() => {
     const savedName = localStorage.getItem('userName')
@@ -74,7 +75,7 @@ export default function LessonContent({ content, lessonId }) {
   }
 
   const handleSectionComplete = (index) => {
-    markSectionComplete()
+    markSectionComplete(lessonId)
     setCompletedSections(prev => ({
       ...prev,
       [index]: true
@@ -95,15 +96,29 @@ export default function LessonContent({ content, lessonId }) {
     
     // Set total sections count (only counting subsections)
     useEffect(() => {
-      setTotalSections(subsections.length);
+      setTotalSections(lessonId, subsections.length);
     }, []);
 
     return (
       <>
         <div className="mb-8">
-          <ProgressBar percentage={progress} height="12px" />
-          <div className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Overall Progress: {progress}%
+          <div className="mb-4">
+            <div className="flex justify-between mb-2">
+              <span style={{ color: 'var(--text-primary)' }}>Lesson Progress</span>
+              <span style={{ color: 'var(--text-secondary)' }}>
+                {lessonProgress}%
+              </span>
+            </div>
+            <ProgressBar percentage={lessonProgress} height="8px" />
+          </div>
+          <div>
+            <div className="flex justify-between mb-2">
+              <span style={{ color: 'var(--text-primary)' }}>Overall Course Progress</span>
+              <span style={{ color: 'var(--text-secondary)' }}>
+                {progress}%
+              </span>
+            </div>
+            <ProgressBar percentage={progress} height="12px" />
           </div>
         </div>
 

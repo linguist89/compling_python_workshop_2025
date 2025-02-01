@@ -29,7 +29,7 @@ const FlagRain = ({ countryCode, onAnimationComplete, userName }) => {
           left: Math.random() * 100,
           delay: Math.random() * 1.5,
           rotation: Math.random() * 360,
-          fontSize: 32 + Math.random() * 28, // Random size between 32-60px
+          fontSize: 16 + Math.random() * 14, // Random size between 16-30px
           color: `hsl(${Math.random() * 360}, 80%, 60%)`, // Random vibrant color
         });
       }

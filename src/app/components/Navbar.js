@@ -5,11 +5,13 @@ import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import Laptop from './Laptop'
 import { useProgress } from '../contexts/ProgressContext'
+import { useState } from 'react'
 
 export default function Navbar() {
   const pathname = usePathname()
   const { getProgress } = useProgress()
   const progress = getProgress()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
     <nav 
@@ -43,8 +45,8 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* Progress Section */}
-          <div className="flex items-center gap-8 flex-1 max-w-md mx-8">
+          {/* Progress Section - Hidden on mobile */}
+          <div className="hidden md:flex items-center gap-8 flex-1 max-w-md mx-8">
             <div className="relative w-32 h-16 -ml-4">
               <div className="absolute top-1/2 left-0 transform -translate-y-1/2 scale-[0.2]">
                 <Laptop 
@@ -69,7 +71,8 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-6">
             <Link
               href="/lessons"
               className="transition-colors duration-300"
@@ -100,6 +103,86 @@ export default function Navbar() {
             >
               Settings
             </Link>
+          </div>
+
+          {/* Hamburger Menu Button */}
+          <button
+            className="md:hidden p-2"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <div className="w-6 h-5 relative flex flex-col justify-between">
+              <span 
+                className={`w-full h-0.5 transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`}
+                style={{ backgroundColor: 'var(--text-primary)' }}
+              />
+              <span 
+                className={`w-full h-0.5 transition-opacity duration-300 ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`}
+                style={{ backgroundColor: 'var(--text-primary)' }}
+              />
+              <span 
+                className={`w-full h-0.5 transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}
+                style={{ backgroundColor: 'var(--text-primary)' }}
+              />
+            </div>
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        <div 
+          className={`md:hidden transition-all duration-300 overflow-hidden ${isMenuOpen ? 'max-h-96' : 'max-h-0'}`}
+          style={{ backgroundColor: 'var(--color-background)' }}
+        >
+          <div className="py-4 space-y-4">
+            <Link
+              href="/lessons"
+              className="block px-4 py-2 transition-colors duration-300"
+              style={{
+                color: pathname === '/lessons' ? 'var(--text-accent)' : 'var(--text-primary)',
+                backgroundColor: pathname === '/lessons' ? 'var(--color-hover)' : 'transparent'
+              }}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Lessons
+            </Link>
+            <Link
+              href="/exercises"
+              className="block px-4 py-2 transition-colors duration-300"
+              style={{
+                color: pathname === '/exercises' ? 'var(--text-accent)' : 'var(--text-primary)',
+                backgroundColor: pathname === '/exercises' ? 'var(--color-hover)' : 'transparent'
+              }}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Exercises
+            </Link>
+            <Link
+              href="/personalize"
+              className="block px-4 py-2 transition-colors duration-300"
+              style={{
+                color: pathname === '/personalize' ? 'var(--text-accent)' : 'var(--text-primary)',
+                backgroundColor: pathname === '/personalize' ? 'var(--color-hover)' : 'transparent'
+              }}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Settings
+            </Link>
+
+            {/* Mobile Progress Display */}
+            <div className="px-4 pt-4 border-t" style={{ borderColor: 'var(--card-border)' }}>
+              <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div 
+                  className="h-2.5 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${Math.min(progress || 0, 100)}%`,
+                    background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))'
+                  }}
+                ></div>
+              </div>
+              <div className="text-xs mt-1 text-center" style={{ color: 'var(--text-secondary)' }}>
+                {Math.min(progress || 0, 100)}% Complete
+              </div>
+            </div>
           </div>
         </div>
       </div>
