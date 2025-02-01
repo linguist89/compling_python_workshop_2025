@@ -4,35 +4,24 @@ export default function ExercisesPage() {
   const exercises = [
     {
       id: 1,
-      title: "Python Basics",
-      description: "Practice fundamental Python concepts including variables, data types, and basic operations.",
+      title: "String and List Manipulation",
+      description: "Process a list of book titles and their publication years to practice string manipulation, list operations, and basic Python data types.",
       difficulty: "Beginner",
-      estimatedTime: "30 minutes",
-      topics: ["Variables", "Data Types", "Operations"]
+      topics: ["Strings", "Lists", "Sorting", "Data Types"]
     },
     {
       id: 2,
-      title: "Control Flow",
-      description: "Work with if statements, loops, and conditional expressions.",
-      difficulty: "Beginner",
-      estimatedTime: "45 minutes",
-      topics: ["If Statements", "Loops", "Conditionals"]
+      title: "Grade Calculator",
+      description: "Create a program that processes student grades and generates a summary report using functions, error handling, and data processing.",
+      difficulty: "Intermediate",
+      topics: ["Functions", "Error Handling", "Data Processing", "Formatting"]
     },
     {
       id: 3,
-      title: "Functions and Modules",
-      description: "Create and use functions, import modules, and understand scope.",
-      difficulty: "Intermediate",
-      estimatedTime: "1 hour",
-      topics: ["Functions", "Modules", "Scope"]
-    },
-    {
-      id: 4,
-      title: "Data Analysis with Pandas",
-      description: "Analyze linguistic data using Pandas DataFrames.",
+      title: "COVID-19 Data Analysis",
+      description: "Analyze and visualize COVID-19 vaccination data using Pandas for data manipulation and Matplotlib for creating informative visualizations.",
       difficulty: "Advanced",
-      estimatedTime: "1.5 hours",
-      topics: ["Pandas", "Data Analysis", "Statistics"]
+      topics: ["Pandas", "Matplotlib", "Data Analysis", "Visualization"]
     }
   ];
 
@@ -57,8 +46,8 @@ export default function ExercisesPage() {
             className="text-lg mb-12"
             style={{ color: 'var(--text-secondary)' }}
           >
-            Put your Python skills to the test with our interactive exercises. Each exercise
-            includes real-time feedback and hints to help you learn.
+            Test your Python skills with these hands-on exercises. Each exercise provides sample input data,
+            clear requirements, and expected outputs to help you validate your solution.
           </p>
 
           <div className="grid gap-6 md:grid-cols-2">
@@ -109,21 +98,6 @@ export default function ExercisesPage() {
                       }}
                     >
                       {exercise.difficulty}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <span 
-                      className="text-sm font-medium"
-                      style={{ color: 'var(--text-muted)' }}
-                    >
-                      Time:
-                    </span>
-                    <span 
-                      className="text-sm"
-                      style={{ color: 'var(--text-secondary)' }}
-                    >
-                      {exercise.estimatedTime}
                     </span>
                   </div>
 

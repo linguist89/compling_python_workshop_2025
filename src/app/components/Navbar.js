@@ -111,19 +111,18 @@ export default function Navbar() {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
-            <div className="w-6 h-5 relative flex flex-col justify-between">
-              <span 
-                className={`w-full h-0.5 transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`}
-                style={{ backgroundColor: 'var(--text-primary)' }}
-              />
-              <span 
-                className={`w-full h-0.5 transition-opacity duration-300 ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`}
-                style={{ backgroundColor: 'var(--text-primary)' }}
-              />
-              <span 
-                className={`w-full h-0.5 transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}
-                style={{ backgroundColor: 'var(--text-primary)' }}
-              />
+            <div className="w-6 h-6 relative">
+              {isMenuOpen ? (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6" style={{ color: 'var(--text-primary)' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <div className="w-full h-full flex flex-col justify-between">
+                  <span className="w-full h-0.5" style={{ backgroundColor: 'var(--text-primary)' }} />
+                  <span className="w-full h-0.5" style={{ backgroundColor: 'var(--text-primary)' }} />
+                  <span className="w-full h-0.5" style={{ backgroundColor: 'var(--text-primary)' }} />
+                </div>
+              )}
             </div>
           </button>
         </div>

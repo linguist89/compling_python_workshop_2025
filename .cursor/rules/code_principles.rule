@@ -1,0 +1,241 @@
+# Uncle Bob’s SOLID Principles in Programming
+
+SOLID is an acronym coined by Robert C. Martin (Uncle Bob) that represents five design principles intended to make software designs more understandable, flexible, and maintainable.
+
+1. **S**ingle Responsibility Principle (SRP)  
+2. **O**pen/Closed Principle (OCP)  
+3. **L**iskov Substitution Principle (LSP)  
+4. **I**nterface Segregation Principle (ISP)  
+5. **D**ependency Inversion Principle (DIP)  
+
+Below is a high-level explanation of each principle and an example using **React** to illustrate how they apply.
+
+---
+
+## 1. Single Responsibility Principle (SRP)
+
+A class (or module, function, component, etc.) should have only one responsibility. In React, this often means breaking down large components into smaller, more focused components.
+
+**Example**  
+Imagine a component that both fetches data from an API and displays the UI. This violates SRP because it has multiple reasons to change. A better approach is to separate the concerns:
+
+    // Bad: Single component does everything
+    function UserProfile() {
+      const [userData, setUserData] = React.useState(null);
+
+      React.useEffect(() => {
+        fetch('/api/user')
+          .then(response => response.json())
+          .then(data => setUserData(data));
+      }, []);
+
+      if (!userData) return <div>Loading...</div>;
+
+      return (
+        <div>
+          <h1>User Profile</h1>
+          <img src={userData.avatarUrl} alt="User Avatar" />
+          <p>{userData.name}</p>
+          {/* ... more UI */}
+        </div>
+      );
+    }
+
+    // Good: Separate data fetching from presentation
+    function useUserData() {
+      const [userData, setUserData] = React.useState(null);
+      
+      React.useEffect(() => {
+        fetch('/api/user')
+          .then(response => response.json())
+          .then(data => setUserData(data));
+      }, []);
+
+      return userData;
+    }
+
+    function UserProfile() {
+      const userData = useUserData();
+
+      if (!userData) return <div>Loading...</div>;
+
+      return <UserProfileView user={userData} />;
+    }
+
+    function UserProfileView({ user }) {
+      return (
+        <div>
+          <h1>User Profile</h1>
+          <img src={user.avatarUrl} alt="User Avatar" />
+          <p>{user.name}</p>
+          {/* ... more UI */}
+        </div>
+      );
+    }
+
+---
+
+## 2. Open/Closed Principle (OCP)
+
+Objects or entities should be open for extension but closed for modification. You should be able to extend a component’s behavior without modifying its existing code.
+
+**Example**  
+You might write components that accept render props or use higher-order components that can be extended without needing to alter the original component’s logic:
+
+    // Basic Button
+    function Button({ children, onClick }) {
+      return <button onClick={onClick}>{children}</button>;
+    }
+
+    // Extended usage: We can wrap the Button with new behaviors
+    function withAnalytics(WrappedComponent) {
+      return function EnhancedComponent(props) {
+        function handleClick() {
+          console.log("Analytics event logged!");
+          props.onClick();
+        }
+
+        return <WrappedComponent {...props} onClick={handleClick} />;
+      };
+    }
+
+    const AnalyticsButton = withAnalytics(Button);
+
+    function App() {
+      return (
+        <AnalyticsButton onClick={() => alert("Button clicked!")}>
+          Click Me
+        </AnalyticsButton>
+      );
+    }
+
+---
+
+## 3. Liskov Substitution Principle (LSP)
+
+Subtypes must be substitutable for their base types without altering the correctness of the program. In React, think of components that can be replaced by other components with the same props contract.
+
+**Example**  
+If you have a `<Button>` component, you could swap it with a `<LinkButton>` that follows the same prop interface:
+
+    function Button({ onClick, label }) {
+      return <button onClick={onClick}>{label}</button>;
+    }
+
+    function LinkButton({ onClick, label }) {
+      // maybe it behaves like a link, but still accepts onClick, label, etc.
+      return (
+        <a href="#" onClick={onClick} style={{ textDecoration: 'underline' }}>
+          {label}
+        </a>
+      );
+    }
+
+    // Both components can be used interchangeably if they adhere to the same contract:
+    function App() {
+      const [useLink, setUseLink] = React.useState(false);
+      const ButtonComponent = useLink ? LinkButton : Button;
+
+      return (
+        <ButtonComponent
+          label="Click me!"
+          onClick={() => alert("Hello!")}
+        />
+      );
+    }
+
+---
+
+## 4. Interface Segregation Principle (ISP)
+
+Many small, client-specific interfaces are better than one large, general-purpose interface. In React, this can mean ensuring components receive only the props they need. Avoid passing a single object with lots of unused properties.
+
+**Example**  
+
+    // Bad: One giant props object used by all children
+    function UserProfile({ data }) {
+      // data = { user, setUser, fetchUserData, isLoading, error, ...maybe more }
+      // This component might only need user and isLoading
+      // but is forced to accept everything.
+      return (
+        <>
+          {data.isLoading ? <p>Loading...</p> : <p>{data.user.name}</p>}
+        </>
+      );
+    }
+
+    // Good: Segregate props into smaller, more meaningful props
+    function UserProfile({ user, isLoading }) {
+      return (
+        <>
+          {isLoading ? <p>Loading...</p> : <p>{user.name}</p>}
+        </>
+      );
+    }
+
+---
+
+## 5. Dependency Inversion Principle (DIP)
+
+High-level modules should not depend on low-level modules; both should depend on abstractions. In React, a common way to handle DIP is through **Context** or custom hooks, where components depend on abstract data sources rather than concrete implementations.
+
+**Example**  
+
+    // CartContext.js
+    const CartContext = React.createContext();
+
+    export function CartProvider({ children, cartService }) {
+      const [cart, setCart] = React.useState([]);
+
+      React.useEffect(() => {
+        cartService.loadCart().then(setCart);
+      }, [cartService]);
+
+      function addToCart(item) {
+        cartService.addItem(item).then(updatedCart => setCart(updatedCart));
+      }
+
+      return (
+        <CartContext.Provider value={{ cart, addToCart }}>
+          {children}
+        </CartContext.Provider>
+      );
+    }
+
+    // In your App:
+    import { CartProvider } from './CartContext';
+    import CartService from './api/CartService'; // This is a low-level detail
+
+    function App() {
+      return (
+        <CartProvider cartService={CartService}>
+          <MyEcommerce />
+        </CartProvider>
+      );
+    }
+
+    // Now any component can use CartContext without depending on CartService directly
+    function ShoppingCart() {
+      const { cart, addToCart } = React.useContext(CartContext);
+
+      // The component doesn't need to know how items are stored or fetched
+      return (
+        <div>
+          <h2>Your Shopping Cart</h2>
+          {/* Render items in cart */}
+          {/* addToCart logic is abstracted away */}
+        </div>
+      );
+    }
+
+---
+
+## Summary
+
+- **Single Responsibility Principle (SRP)**: Break components into distinct parts (data fetching, UI rendering, etc.) to reduce coupling.  
+- **Open/Closed Principle (OCP)**: Extend components with additional behaviors (HOCs, render props) without altering their internal code.  
+- **Liskov Substitution Principle (LSP)**: Design interchangeable components (e.g., `<Button>` and `<LinkButton>`) that share the same interface.  
+- **Interface Segregation Principle (ISP)**: Don’t pass large prop objects; provide only what each component truly needs.  
+- **Dependency Inversion Principle (DIP)**: Rely on abstractions (contexts, custom hooks) rather than concrete implementations (direct APIs).
+
+By applying SOLID principles in your React applications, you can build code that’s cleaner, more maintainable, and easier to extend.

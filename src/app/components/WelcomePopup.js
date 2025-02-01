@@ -54,7 +54,6 @@ export default function WelcomePopup() {
         <FlagRain
           countryCode={selectedCountry.code}
           onAnimationComplete={() => setShowFlagRain(false)}
-          userName={name}
         />
       )}
       <div 
