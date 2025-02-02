@@ -72,6 +72,57 @@ function ComponentCard({ title, type, dependencies, description, children }) {
   );
 }
 
+function ColorPalette({ colors, title }) {
+  return (
+    <div className="mb-8">
+      <h3 className="text-lg font-semibold mb-4 text-[#00E6E6]">{title}</h3>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {colors.map(({ name, value, description }) => (
+          <div key={name} className="border border-[#00E6E620] rounded-lg p-4 bg-[#112240]">
+            <div 
+              className="h-16 rounded-lg mb-2 border border-[#00E6E620]" 
+              style={{ backgroundColor: value }}
+            />
+            <div className="text-[#00E6E6] font-medium mb-1">{name}</div>
+            <div className="text-[#B8D4D4] text-sm">{value}</div>
+            <div className="text-[#8CA2A2] text-sm mt-1">{description}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function GradientPalette({ gradients }) {
+  return (
+    <div className="mb-8">
+      <h3 className="text-lg font-semibold mb-4 text-[#00E6E6]">Gradients</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {gradients.map(({ name, value, description }) => (
+          <div key={name} className="border border-[#00E6E620] rounded-lg p-4 bg-[#112240]">
+            <div 
+              className="h-24 rounded-lg mb-2 border border-[#00E6E620]" 
+              style={{ background: value }}
+            />
+            <div className="text-[#00E6E6] font-medium mb-1">{name}</div>
+            <div className="text-[#B8D4D4] text-sm">{value}</div>
+            <div className="text-[#8CA2A2] text-sm mt-1">{description}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StyleGuideSection({ title, children }) {
+  return (
+    <div className="border border-[#00E6E620] rounded-lg p-6 mb-8 bg-[#112240]">
+      <h3 className="text-lg font-semibold mb-4 text-[#00E6E6]">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
 export default function ComponentsPage() {
   const [showFlagRain, setShowFlagRain] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
@@ -82,7 +133,15 @@ export default function ComponentsPage() {
     setShowFlagRain(false);
   }, []);
 
-  const levels = ['Atoms', 'Molecules', 'Organisms', 'Templates', 'Pages'];
+  const levels = [
+    'Atoms', 
+    'Molecules', 
+    'Organisms', 
+    'Templates', 
+    'Pages', 
+    'Colors & Gradients',
+    'Style Guide'
+  ];
 
   const renderContent = () => {
     switch (activeLevel) {
@@ -255,7 +314,7 @@ export default function ComponentsPage() {
                 dependencies={['Next.js Layout', 'TailwindCSS']}
                 description="Base template for lesson pages showing navigation, content area, and interactive elements."
               >
-                <div className="border-2 border-dashed border-[#00E6E620] p-4 rounded-lg">
+                <div className="border-2 border-dashed border-[#00E6E620] p-4 rounded-lg bg-[#0A192F]">
                   <div className="h-16 bg-[#112240] mb-4 rounded" title="Navigation Area"></div>
                   <div className="flex gap-4">
                     <div className="w-3/4">
@@ -286,13 +345,13 @@ export default function ComponentsPage() {
                 dependencies={['Next.js Page', 'React Components', 'TailwindCSS']}
                 description="Complete lesson page with actual content, navigation, and interactive elements."
               >
-                <div className="border-2 border-dashed border-[#00E6E620] p-4 rounded-lg">
+                <div className="border-2 border-dashed border-[#00E6E620] p-4 rounded-lg bg-[#0A192F]">
                   <Navbar />
                   <div className="flex gap-4 mt-4">
                     <div className="w-3/4">
                       <h2 className="text-[#00E6E6] text-xl mb-4">Introduction to Python</h2>
-                      <div className="prose prose-invert">
-                        <p className="text-[#B8D4D4]">Welcome to the Python programming course. In this lesson, we'll cover the basics of Python syntax and programming concepts.</p>
+                      <div className="prose prose-invert max-w-none">
+                        <p className="text-[#B8D4D4] !mt-0">Welcome to the Python programming course. In this lesson, we'll cover the basics of Python syntax and programming concepts.</p>
                       </div>
                       <div className="mt-4">
                         <ProgressBar progress={75} />
@@ -308,6 +367,189 @@ export default function ComponentsPage() {
                 </div>
               </ComponentCard>
             </div>
+          </ComponentSection>
+        );
+
+      case 'Colors & Gradients':
+        return (
+          <ComponentSection
+            title="Colors & Gradients"
+            description="The complete color system and gradient patterns used throughout the website."
+          >
+            <ColorPalette
+              title="Primary Colors"
+              colors={[
+                { 
+                  name: 'Primary Background', 
+                  value: '#0A192F',
+                  description: 'Main background color'
+                },
+                { 
+                  name: 'Secondary Background', 
+                  value: '#112240',
+                  description: 'Card and section backgrounds'
+                },
+                { 
+                  name: 'Accent', 
+                  value: '#00E6E6',
+                  description: 'Primary accent color'
+                },
+                { 
+                  name: 'Secondary Accent', 
+                  value: '#FFC107',
+                  description: 'Secondary accent color'
+                },
+              ]}
+            />
+
+            <ColorPalette
+              title="Text Colors"
+              colors={[
+                { 
+                  name: 'Primary Text', 
+                  value: '#E6FFFF',
+                  description: 'Main text color'
+                },
+                { 
+                  name: 'Secondary Text', 
+                  value: '#B8D4D4',
+                  description: 'Secondary text color'
+                },
+                { 
+                  name: 'Muted Text', 
+                  value: '#8CA2A2',
+                  description: 'Muted and helper text'
+                },
+                { 
+                  name: 'Accent Text', 
+                  value: '#00E6E6',
+                  description: 'Highlighted text color'
+                },
+              ]}
+            />
+
+            <GradientPalette
+              gradients={[
+                {
+                  name: 'Background Gradient',
+                  value: 'linear-gradient(to bottom, #0A192F, #050B18)',
+                  description: 'Used for main background effects'
+                },
+                {
+                  name: 'Heading Gradient',
+                  value: 'linear-gradient(to right, #00E6E6, #FFC107)',
+                  description: 'Used for gradient text effects'
+                },
+                {
+                  name: 'Card Gradient',
+                  value: 'linear-gradient(to bottom, #112240, #0A192F)',
+                  description: 'Used for card hover effects'
+                },
+                {
+                  name: 'Hover Gradient',
+                  value: 'linear-gradient(to right, #00E6E6, #00FFFF)',
+                  description: 'Used for interactive element hovers'
+                },
+              ]}
+            />
+          </ComponentSection>
+        );
+
+      case 'Style Guide':
+        return (
+          <ComponentSection
+            title="Style Guide"
+            description="Common styling patterns and component design guidelines."
+          >
+            <StyleGuideSection title="Button Styles">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="space-y-4">
+                  <h4 className="text-[#B8D4D4] font-medium mb-2">Primary Buttons</h4>
+                  <button className="px-4 py-2 bg-[#00E6E6] text-[#0A192F] rounded hover:bg-[#00FFFF] transition-all">
+                    Primary Button
+                  </button>
+                  <div className="text-[#8CA2A2] text-sm mt-2">
+                    Used for main actions. Background: #00E6E6, Hover: #00FFFF
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h4 className="text-[#B8D4D4] font-medium mb-2">Secondary Buttons</h4>
+                  <button className="px-4 py-2 border border-[#00E6E6] text-[#00E6E6] rounded hover:bg-[#112240] transition-all">
+                    Secondary Button
+                  </button>
+                  <div className="text-[#8CA2A2] text-sm mt-2">
+                    Used for alternative actions. Border color: #00E6E6
+                  </div>
+                </div>
+              </div>
+            </StyleGuideSection>
+
+            <StyleGuideSection title="Card Styles">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="border border-[#00E6E620] rounded-lg p-4 bg-[#112240]">
+                  <h4 className="text-[#00E6E6] font-medium mb-2">Standard Card</h4>
+                  <p className="text-[#B8D4D4] text-sm">
+                    Default card style with subtle border and darker background.
+                  </p>
+                </div>
+                <div className="border border-[#00E6E620] rounded-lg p-4 bg-[#112240] shadow-[0_8px_30px_rgba(0,230,230,0.2)]">
+                  <h4 className="text-[#00E6E6] font-medium mb-2">Elevated Card</h4>
+                  <p className="text-[#B8D4D4] text-sm">
+                    Card with glow effect for highlighted content.
+                  </p>
+                </div>
+              </div>
+            </StyleGuideSection>
+
+            <StyleGuideSection title="Typography">
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-3xl font-bold text-[#E6FFFF] mb-2">Heading 1</h1>
+                  <div className="text-[#8CA2A2] text-sm">Font size: 30px (1.875rem), Weight: 700</div>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-[#00E6E6] mb-2">Heading 2</h2>
+                  <div className="text-[#8CA2A2] text-sm">Font size: 24px (1.5rem), Weight: 700</div>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-[#00E6E6] mb-2">Heading 3</h3>
+                  <div className="text-[#8CA2A2] text-sm">Font size: 20px (1.25rem), Weight: 600</div>
+                </div>
+                <div>
+                  <p className="text-[#B8D4D4] mb-2">Body Text</p>
+                  <div className="text-[#8CA2A2] text-sm">Font size: 16px (1rem), Weight: 400</div>
+                </div>
+                <div>
+                  <p className="text-[#8CA2A2] text-sm mb-2">Small Text</p>
+                  <div className="text-[#8CA2A2] text-sm">Font size: 14px (0.875rem), Weight: 400</div>
+                </div>
+              </div>
+            </StyleGuideSection>
+
+            <StyleGuideSection title="Spacing System">
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-4 h-4 bg-[#00E6E6] rounded"></div>
+                  <span className="text-[#B8D4D4]">4px - Extra Small (0.25rem)</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-6 h-6 bg-[#00E6E6] rounded"></div>
+                  <span className="text-[#B8D4D4]">6px - Small (0.375rem)</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 bg-[#00E6E6] rounded"></div>
+                  <span className="text-[#B8D4D4]">8px - Base (0.5rem)</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#00E6E6] rounded"></div>
+                  <span className="text-[#B8D4D4]">12px - Medium (0.75rem)</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-[#00E6E6] rounded"></div>
+                  <span className="text-[#B8D4D4]">16px - Large (1rem)</span>
+                </div>
+              </div>
+            </StyleGuideSection>
           </ComponentSection>
         );
 
