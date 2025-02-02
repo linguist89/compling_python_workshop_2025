@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Default theme (neon) */
 :root {
   --color-primary: #0A192F;
   --color-secondary: #00E6E6;
@@ -10,15 +11,69 @@
   --color-light: #E6FFFF;
 }
 
+/* Light theme overrides */
+[data-theme="daylight"] {
+  --color-primary: #FFFFFF;
+  --color-secondary: #3182CE;
+  --color-accent: #ED8936;
+  --color-dark: #F7FAFC;
+  --color-light: #2D3748;
+  --text-primary: #2D3748;
+  --text-secondary: #4A5568;
+  --text-muted: #718096;
+  --text-accent: #3182CE;
+  --text-inverse: #FFFFFF;
+  --interactive-hover: #3182CE;
+  --interactive-active: #2B6CB0;
+  --interactive-focus: #4299E1;
+  --interactive-disabled: #A0AEC0;
+  --card-background: #F8FAFC;
+  --card-border: #E2E8F0;
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  --gradient-background: linear-gradient(to right, #FFFFFF, #F7FAFC);
+  --gradient-heading: linear-gradient(to right, #3182CE, #ED8936);
+  --gradient-card: linear-gradient(to right, #F8FAFC, #F1F5F9);
+  --gradient-hover: linear-gradient(to right, #3182CE, #2B6CB0);
+}
+
+/* Dark theme overrides */
+[data-theme="neon"] {
+  --color-primary: #0A192F;
+  --color-secondary: #00E6E6;
+  --color-accent: #FFC107;
+  --color-dark: #050B18;
+  --color-light: #E6FFFF;
+  --text-primary: #E6FFFF;
+  --text-secondary: #B8D4D4;
+  --text-muted: #8CA2A2;
+  --text-accent: #00E6E6;
+  --text-inverse: #0A192F;
+  --interactive-hover: #00E6E6;
+  --interactive-active: #00FFFF;
+  --interactive-focus: #FFC107;
+  --interactive-disabled: #4D5B5B;
+  --card-background: #0D1B2A;
+  --card-border: #00E6E620;
+  --card-shadow: 0 4px 20px rgba(0, 230, 230, 0.1);
+  --gradient-background: linear-gradient(to right, #0A192F, #050B18);
+  --gradient-heading: linear-gradient(to right, #00E6E6, #FFC107);
+  --gradient-card: linear-gradient(to right, #0D1B2A, #0A192F);
+  --gradient-hover: linear-gradient(to right, #00E6E6, #00FFFF);
+}
+
 @layer base {
   body {
-    @apply bg-gradient-to-br from-[#0A192F] to-[#050B18] text-[#E6FFFF] min-h-screen;
+    @apply min-h-screen;
     font-family: 'Inter', sans-serif;
+    background-color: var(--color-primary);
+    color: var(--text-primary);
   }
   
   code {
     font-family: 'Fira Code', 'Courier New', monospace;
-    @apply bg-[#112240] rounded-lg p-4 my-4 border border-[#00E6E6]/20;
+    @apply bg-opacity-10 rounded-lg p-4 my-4;
+    background-color: var(--card-background);
+    border: 1px solid var(--card-border);
   }
 
   /* Smooth scrolling and selection styles */
@@ -27,77 +82,79 @@
   }
 
   ::selection {
-    @apply bg-[#00E6E6]/30 text-[#E6FFFF];
+    background-color: var(--interactive-hover);
+    opacity: 0.3;
+    color: var(--text-primary);
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-[#00E6E6] text-[#0A192F] px-6 py-2 rounded-lg 
-           hover:bg-[#00E6E6]/90 transition-all duration-300 
-           hover:shadow-[0_0_15px_rgba(0,230,230,0.5)] font-medium;
+    @apply px-6 py-2 rounded-lg transition-all duration-300 font-medium;
+    background-color: var(--interactive-hover);
+    color: var(--text-inverse);
+  }
+  
+  .btn-primary:hover {
+    opacity: 0.9;
+    box-shadow: var(--effect-buttonHover);
   }
   
   .btn-secondary {
-    @apply bg-transparent text-[#00E6E6] px-6 py-2 rounded-lg 
-           border border-[#00E6E6] hover:bg-[#00E6E6]/10 
-           transition-all duration-300 font-medium;
+    @apply px-6 py-2 rounded-lg transition-all duration-300 font-medium;
+    background-color: transparent;
+    color: var(--interactive-hover);
+    border: 1px solid var(--interactive-hover);
   }
   
-  .btn-accent {
-    @apply bg-[#FFC107] text-[#0A192F] px-6 py-2 rounded-lg 
-           hover:bg-[#FFC107]/90 transition-all duration-300 
-           hover:shadow-[0_0_15px_rgba(255,193,7,0.5)] font-medium;
+  .btn-secondary:hover {
+    background-color: var(--interactive-hover);
+    opacity: 0.1;
   }
   
   .container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* Card and section styles */
-  .tech-card {
-    @apply bg-gradient-to-br from-[#112240] to-[#0A192F] 
-           p-6 rounded-xl border border-[#00E6E6]/20
-           hover:border-[#00E6E6]/50 transition-all duration-300
-           hover:shadow-[0_0_30px_rgba(0,230,230,0.1)];
+  /* Card styles */
+  .card {
+    @apply rounded-xl transition-all duration-300;
+    background-color: var(--card-background);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+  }
+
+  .card:hover {
+    border-color: var(--interactive-hover);
+    box-shadow: var(--effect-cardHover);
   }
 
   /* Heading styles */
   .heading-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r 
-           from-[#00E6E6] to-[#FFC107] font-bold;
-  }
-
-  /* Code block styles */
-  .code-block {
-    @apply bg-[#112240] rounded-lg p-4 my-4 
-           border border-[#00E6E6]/20 relative
-           overflow-x-auto;
+    @apply font-bold;
+    background: var(--gradient-heading);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   /* Link styles */
   .neon-link {
-    @apply text-[#00E6E6] hover:text-[#FFC107] 
-           transition-all duration-300 relative
-           after:content-[''] after:absolute after:bottom-0 
-           after:left-0 after:w-0 after:h-[2px] 
-           after:bg-[#FFC107] after:transition-all 
-           hover:after:w-full;
+    @apply relative transition-all duration-300;
+    color: var(--interactive-hover);
   }
 
-  /* Animation utilities */
-  .hover-glow {
-    @apply transition-all duration-300 
-           hover:shadow-[0_0_15px_rgba(0,230,230,0.3)];
+  .neon-link:hover {
+    color: var(--interactive-active);
   }
 
-  .pulse {
-    @apply animate-pulse;
+  .neon-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300;
+    background-color: var(--interactive-active);
   }
 
-  /* Grid and layout utilities */
-  .tech-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  .neon-link:hover::after {
+    @apply w-full;
   }
 }
 

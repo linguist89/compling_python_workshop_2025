@@ -10,10 +10,14 @@ export function useTheme() {
 }
 
 export default function ThemeProvider({ children }) {
-  const [currentTheme, setCurrentTheme] = useState(themes.neon)
+  const [mounted, setMounted] = useState(false)
+  const [currentTheme, setCurrentTheme] = useState(themes.neon) // Default to neon theme for SSR
 
   const applyTheme = (theme) => {
+    if (typeof document === 'undefined') return
+
     const root = document.documentElement
+    root.setAttribute('data-theme', Object.keys(themes).find(key => themes[key] === theme) || 'neon')
 
     // Primary colors
     Object.entries(theme.primary).forEach(([key, value]) => {
@@ -49,6 +53,8 @@ export default function ThemeProvider({ children }) {
   }
 
   useEffect(() => {
+    // Only run on client side
+    setMounted(true)
     const savedTheme = localStorage.getItem('userTheme') || 'neon'
     const theme = themes[savedTheme]
     setCurrentTheme(theme)
@@ -60,6 +66,15 @@ export default function ThemeProvider({ children }) {
     setCurrentTheme(theme)
     applyTheme(theme)
     localStorage.setItem('userTheme', themeKey)
+  }
+
+  // Prevent hydration mismatch by not rendering children until mounted
+  if (!mounted) {
+    return (
+      <div style={{ visibility: 'hidden' }}>
+        {children}
+      </div>
+    )
   }
 
   return (
