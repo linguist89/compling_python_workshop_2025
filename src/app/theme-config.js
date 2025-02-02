@@ -39,7 +39,7 @@ export const themes = {
         hoverLink: '#FFC107',
       },
       card: {
-        background: '#112240',
+        background: '#0D1B2A',
         border: '#00E6E620',
         title: '#00E6E6',
         text: '#B8D4D4',
@@ -63,7 +63,7 @@ export const themes = {
     gradients: {
       background: 'from-[#0A192F] to-[#050B18]',
       heading: 'from-[#00E6E6] to-[#FFC107]',
-      card: 'from-[#112240] to-[#0A192F]',
+      card: 'from-[#0D1B2A] to-[#0A192F]',
       hover: 'from-[#00E6E6] to-[#00FFFF]',
     },
     effects: {
@@ -80,7 +80,7 @@ export const themes = {
       background: '#FFFFFF',
       text: '#2D3748',
       accent: '#3182CE',
-      secondary: '#4299E1',
+      secondary: '#ED8936',
       dark: '#F7FAFC',
     },
     text: {
@@ -102,17 +102,17 @@ export const themes = {
         border: '#E2E8F0',
         text: '#2D3748',
         activeLink: '#3182CE',
-        hoverLink: '#4299E1',
+        hoverLink: '#ED8936',
       },
       footer: {
         background: '#F7FAFC',
         border: '#E2E8F0',
         text: '#4A5568',
         link: '#3182CE',
-        hoverLink: '#4299E1',
+        hoverLink: '#ED8936',
       },
       card: {
-        background: '#FFFFFF',
+        background: '#F8FAFC',
         border: '#E2E8F0',
         title: '#3182CE',
         text: '#4A5568',
@@ -120,7 +120,7 @@ export const themes = {
       },
       button: {
         primary: '#3182CE',
-        secondary: '#4299E1',
+        secondary: '#ED8936',
         text: '#FFFFFF',
         hover: '#2B6CB0',
         disabled: '#A0AEC0',
@@ -135,8 +135,8 @@ export const themes = {
     },
     gradients: {
       background: 'from-[#FFFFFF] to-[#F7FAFC]',
-      heading: 'from-[#3182CE] to-[#4299E1]',
-      card: 'from-[#FFFFFF] to-[#F7FAFC]',
+      heading: 'from-[#3182CE] to-[#ED8936]',
+      card: 'from-[#F8FAFC] to-[#F1F5F9]',
       hover: 'from-[#3182CE] to-[#2B6CB0]',
     },
     effects: {

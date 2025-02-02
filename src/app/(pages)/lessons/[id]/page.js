@@ -3,7 +3,19 @@ import { getMarkdownContent } from './page.server';
 import LessonContent from './LessonContent';
 
 export default async function LessonPage({ params }) {
-  const content = await getMarkdownContent(params.id);
+  // Ensure params.id is available before using it
+  const lessonId = params?.id;
+  if (!lessonId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
+          Invalid lesson ID
+        </p>
+      </div>
+    );
+  }
+
+  const content = await getMarkdownContent(lessonId);
   
   if (!content) {
     return (
@@ -23,7 +35,7 @@ export default async function LessonPage({ params }) {
         </p>
       </div>
     }>
-      <LessonContent content={content} lessonId={params.id} />
+      <LessonContent content={content} lessonId={lessonId} />
     </Suspense>
   );
 } 
