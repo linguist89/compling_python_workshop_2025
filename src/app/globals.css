@@ -13,27 +13,26 @@
 
 /* Light theme overrides */
 [data-theme="daylight"] {
-  --color-primary: #FFFFFF;
-  --color-secondary: #3182CE;
-  --color-accent: #ED8936;
-  --color-dark: #F7FAFC;
-  --color-light: #2D3748;
-  --text-primary: #2D3748;
-  --text-secondary: #4A5568;
-  --text-muted: #718096;
-  --text-accent: #3182CE;
+  --color-primary: #F8FAFC;
+  --color-secondary: #2563EB;
+  --color-accent: #F97316;
+  --color-dark: #F1F5F9;
+  --color-light: #1E293B;
+  --text-primary: #1E293B;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --text-accent: #2563EB;
   --text-inverse: #FFFFFF;
-  --interactive-hover: #3182CE;
-  --interactive-active: #2B6CB0;
-  --interactive-focus: #4299E1;
-  --interactive-disabled: #A0AEC0;
-  --card-background: #F8FAFC;
+  --interactive-hover: #2563EB;
+  --interactive-active: #1D4ED8;
+  --interactive-focus: #3B82F6;
+  --interactive-disabled: #94A3B8;
+  --card-background: #FFFFFF;
   --card-border: #E2E8F0;
-  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  --gradient-background: linear-gradient(to right, #FFFFFF, #F7FAFC);
-  --gradient-heading: linear-gradient(to right, #3182CE, #ED8936);
-  --gradient-card: linear-gradient(to right, #F8FAFC, #F1F5F9);
-  --gradient-hover: linear-gradient(to right, #3182CE, #2B6CB0);
+  --card-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  --gradient-background: linear-gradient(135deg, #F8FAFC, #EFF6FF);
+  --gradient-card: linear-gradient(135deg, #FFFFFF, #F8FAFC);
+  --gradient-hover: linear-gradient(135deg, #2563EB, #1D4ED8);
 }
 
 /* Dark theme overrides */
@@ -56,7 +55,6 @@
   --card-border: #00E6E620;
   --card-shadow: 0 4px 20px rgba(0, 230, 230, 0.1);
   --gradient-background: linear-gradient(to right, #0A192F, #050B18);
-  --gradient-heading: linear-gradient(to right, #00E6E6, #FFC107);
   --gradient-card: linear-gradient(to right, #0D1B2A, #0A192F);
   --gradient-hover: linear-gradient(to right, #00E6E6, #00FFFF);
 }
@@ -132,9 +130,7 @@
   /* Heading styles */
   .heading-gradient {
     @apply font-bold;
-    background: var(--gradient-heading);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-accent);
   }
 
   /* Link styles */

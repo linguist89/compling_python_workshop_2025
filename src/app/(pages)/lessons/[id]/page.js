@@ -3,39 +3,38 @@ import { getMarkdownContent } from './page.server';
 import LessonContent from './LessonContent';
 
 export default async function LessonPage({ params }) {
-  // Ensure params.id is available before using it
-  const lessonId = params?.id;
-  if (!lessonId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-          Invalid lesson ID
-        </p>
-      </div>
-    );
-  }
+  try {
+    const content = await getMarkdownContent(params.id);
+    
+    if (!content) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
+            Lesson not found
+          </p>
+        </div>
+      );
+    }
 
-  const content = await getMarkdownContent(lessonId);
-  
-  if (!content) {
+    return (
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
+            Loading lesson...
+          </p>
+        </div>
+      }>
+        <LessonContent content={content} />
+      </Suspense>
+    );
+  } catch (error) {
+    console.error('Error loading lesson:', error);
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-          Lesson not found
+          Error loading lesson
         </p>
       </div>
     );
   }
-  
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-          Loading lesson...
-        </p>
-      </div>
-    }>
-      <LessonContent content={content} lessonId={lessonId} />
-    </Suspense>
-  );
 } 

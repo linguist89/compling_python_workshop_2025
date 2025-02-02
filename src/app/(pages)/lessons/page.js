@@ -89,11 +89,7 @@ export default function LessonsPage() {
 
           <h1 
             className="text-4xl font-bold mb-8"
-            style={{
-              background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
+            style={{ color: 'var(--text-accent)' }}
           >
             Python Lessons
           </h1>

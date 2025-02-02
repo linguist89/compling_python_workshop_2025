@@ -13,9 +13,7 @@ export default function Home() {
             <h1 
               className="text-6xl font-bold mb-6"
               style={{
-                background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: 'var(--text-accent)',
                 animation: 'float 6s ease-in-out infinite'
               }}
             >
@@ -49,11 +47,7 @@ export default function Home() {
         <div className="container mx-auto">
           <h2 
             className="text-3xl font-bold text-center mb-12"
-            style={{
-              background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
+            style={{ color: 'var(--text-accent)' }}
           >
             What You'll Learn
           </h2>
@@ -107,11 +101,7 @@ export default function Home() {
         <div className="container mx-auto">
           <h2 
             className="text-3xl font-bold text-center mb-12"
-            style={{
-              background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
+            style={{ color: 'var(--text-accent)' }}
           >
             Why Choose This Workshop?
           </h2>
@@ -179,11 +169,7 @@ export default function Home() {
         <div className="container mx-auto text-center">
           <h2 
             className="text-3xl font-bold mb-8"
-            style={{
-              background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
+            style={{ color: 'var(--text-accent)' }}
           >
             Ready to Start Your Python Journey?
           </h2>

@@ -13,11 +13,7 @@ export default function Footer() {
           <div>
             <h3 
               className="text-xl font-bold mb-4"
-              style={{
-                background: `linear-gradient(to right, var(--text-accent), var(--color-secondary))`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
+              style={{ color: 'var(--text-accent)' }}
             >
               Python CompLing Workshop
             </h3>
