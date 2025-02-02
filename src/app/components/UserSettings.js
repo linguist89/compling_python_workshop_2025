@@ -11,6 +11,29 @@ import { useRouter } from 'next/navigation'
 const DEFAULT_FONT_SIZE = 16
 const DEFAULT_THEME = 'neon'
 
+// Add default theme values
+const defaultThemeValues = {
+  currentTheme: {
+    name: 'Neon Night',
+    isDark: true,
+    primary: {
+      background: '#0A192F',
+      dark: '#050B18'
+    }
+  },
+  themes: {
+    neon: {
+      name: 'Neon Night',
+      isDark: true,
+      primary: {
+        background: '#0A192F',
+        dark: '#050B18'
+      }
+    }
+  },
+  updateTheme: () => {} // noop function as default
+}
+
 const lessonTitles = {
   '1': 'Introduction to Python',
   '2': 'Flow Control',
@@ -24,7 +47,19 @@ export default function UserSettings({ onClose }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [confirmName, setConfirmName] = useState('')
   const { getProgress, getLessonProgress, resetProgress } = useProgress()
-  const { themes, currentTheme, updateTheme } = useTheme()
+  
+  // Use try-catch to handle potential theme context errors
+  const themeContext = (() => {
+    try {
+      const context = useTheme()
+      return context || defaultThemeValues
+    } catch (error) {
+      console.warn('Theme context not available, using default values')
+      return defaultThemeValues
+    }
+  })()
+  
+  const { currentTheme, themes, updateTheme } = themeContext
   const router = useRouter()
   const progress = getProgress()
 
@@ -86,7 +121,15 @@ export default function UserSettings({ onClose }) {
   }
 
   const handleThemeChange = (themeKey) => {
-    updateTheme(themeKey)
+    try {
+      if (themes && themes[themeKey] && typeof updateTheme === 'function') {
+        updateTheme(themeKey)
+      } else {
+        console.warn('Theme change failed: invalid theme key or updateTheme not available')
+      }
+    } catch (error) {
+      console.error('Error changing theme:', error)
+    }
   }
 
   const adjustFontSize = (change) => {
@@ -250,16 +293,16 @@ export default function UserSettings({ onClose }) {
             Choose Your Theme
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(themes).map(([key, theme]) => (
+            {themes && Object.entries(themes).map(([key, theme]) => theme && (
               <button
                 key={key}
                 onClick={() => handleThemeChange(key)}
                 className="rounded-lg border transition-all duration-300"
                 style={{
-                  borderColor: currentTheme.name === theme.name 
+                  borderColor: currentTheme?.name === theme?.name 
                     ? 'var(--interactive-hover)'
                     : 'var(--card-border)',
-                  backgroundColor: currentTheme.name === theme.name 
+                  backgroundColor: currentTheme?.name === theme?.name 
                     ? 'var(--interactive-hover)10'
                     : 'transparent',
                 }}
@@ -268,7 +311,7 @@ export default function UserSettings({ onClose }) {
                   <div 
                     className="h-24 rounded-lg"
                     style={{
-                      background: `linear-gradient(to right, ${theme.primary.background}, ${theme.primary.dark})`
+                      background: theme?.primary ? `linear-gradient(to right, ${theme.primary.background || '#000'}, ${theme.primary.dark || '#000'})` : '#000'
                     }}
                   />
                   <div className="flex items-center justify-between">
@@ -276,9 +319,9 @@ export default function UserSettings({ onClose }) {
                       style={{ color: 'var(--text-primary)' }}
                       className="font-medium"
                     >
-                      {theme.name}
+                      {theme?.name || 'Unknown Theme'}
                     </span>
-                    {currentTheme.name === theme.name && (
+                    {currentTheme?.name === theme?.name && (
                       <span style={{ color: 'var(--interactive-hover)' }}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />

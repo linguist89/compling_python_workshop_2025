@@ -58,7 +58,7 @@ export const themes = {
         text: '#E6FFFF',
         placeholder: '#8CA2A2',
         focus: '#00E6E6',
-      },
+      }
     },
     gradients: {
       background: 'from-[#0A192F] to-[#050B18]',
@@ -131,7 +131,7 @@ export const themes = {
         text: '#2D3748',
         placeholder: '#A0AEC0',
         focus: '#3182CE',
-      },
+      }
     },
     gradients: {
       background: 'from-[#FFFFFF] to-[#F7FAFC]',
