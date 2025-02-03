@@ -129,12 +129,24 @@ export default function Navbar() {
               Settings
             </Link>
             {isTeacher && (
-              <button
-                onClick={() => setShowTestDataPopup(true)}
-                className="transition-colors duration-300 text-blue-500 hover:text-blue-600"
-              >
-                Generate Test Data
-              </button>
+              <>
+                <Link
+                  href="/class-groups"
+                  className="transition-colors duration-300"
+                  style={{
+                    color: pathname === '/class-groups' ? 'var(--text-accent)' : 'var(--text-primary)',
+                    borderBottom: pathname === '/class-groups' ? '2px solid var(--text-accent)' : 'none'
+                  }}
+                >
+                  Class Groups
+                </Link>
+                <button
+                  onClick={() => setShowTestDataPopup(true)}
+                  className="transition-colors duration-300 text-blue-500 hover:text-blue-600"
+                >
+                  Generate Test Data
+                </button>
+              </>
             )}
           </div>
 
@@ -230,15 +242,28 @@ export default function Navbar() {
             </div>
 
             {isTeacher && (
-              <button
-                onClick={() => {
-                  setShowTestDataPopup(true)
-                  setIsMenuOpen(false)
-                }}
-                className="block w-full text-left px-4 py-2 transition-colors duration-300 text-blue-500 hover:text-blue-600"
-              >
-                Generate Test Data
-              </button>
+              <>
+                <Link
+                  href="/class-groups"
+                  className="block px-4 py-2 transition-colors duration-300"
+                  style={{
+                    color: pathname === '/class-groups' ? 'var(--text-accent)' : 'var(--text-primary)',
+                    backgroundColor: pathname === '/class-groups' ? 'var(--color-hover)' : 'transparent'
+                  }}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Class Groups
+                </Link>
+                <button
+                  onClick={() => {
+                    setShowTestDataPopup(true)
+                    setIsMenuOpen(false)
+                  }}
+                  className="block w-full text-left px-4 py-2 transition-colors duration-300 text-blue-500 hover:text-blue-600"
+                >
+                  Generate Test Data
+                </button>
+              </>
             )}
           </div>
         </div>
