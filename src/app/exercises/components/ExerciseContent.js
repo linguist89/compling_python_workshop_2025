@@ -5,14 +5,19 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useTheme } from '@/app/contexts/ThemeContext';
 
 export default function ExerciseContent({ content }) {
-  const { currentTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const { currentTheme } = useTheme() || { currentTheme: { isDark: true } };
   const [expandedSections, setExpandedSections] = useState({});
   const [copiedStates, setCopiedStates] = useState({});
   
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Split content into main content and sections
   const { mainContent, sections } = useMemo(() => {
     if (!content) return { mainContent: '', sections: [] };
@@ -84,6 +89,17 @@ export default function ExerciseContent({ content }) {
       }, 2000);
     });
   };
+
+  // If not mounted yet, show a simple loading state that matches the theme
+  if (!mounted) {
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 bg-gray-200 rounded w-3/4" style={{ backgroundColor: 'var(--card-border)' }}></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2" style={{ backgroundColor: 'var(--card-border)' }}></div>
+        <div className="h-4 bg-gray-200 rounded w-5/6" style={{ backgroundColor: 'var(--card-border)' }}></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

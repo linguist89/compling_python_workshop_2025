@@ -11,11 +11,16 @@ import LaptopPopup from '@/app/components/LaptopPopup';
 
 export default function LessonContent({ content, lessonId }) {
   const { markSectionComplete, setTotalSections, progress, getProgress } = useContext(ProgressContext);
-  const { currentTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const { currentTheme } = useTheme() || { currentTheme: { isDark: true } };
   const [expandedSections, setExpandedSections] = useState({});
   const [showLaptopPopup, setShowLaptopPopup] = useState(false);
   const [copiedStates, setCopiedStates] = useState({});
   
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Split content into main content and sections
   const { mainContent, sections } = useMemo(() => {
     if (!content) return { mainContent: '', sections: [] };
@@ -112,6 +117,17 @@ export default function LessonContent({ content, lessonId }) {
       }, 2000);
     });
   };
+
+  // If not mounted yet, show a simple loading state that matches the theme
+  if (!mounted) {
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 bg-gray-200 rounded w-3/4" style={{ backgroundColor: 'var(--card-border)' }}></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2" style={{ backgroundColor: 'var(--card-border)' }}></div>
+        <div className="h-4 bg-gray-200 rounded w-5/6" style={{ backgroundColor: 'var(--card-border)' }}></div>
+      </div>
+    );
+  }
 
   return (
     <>
