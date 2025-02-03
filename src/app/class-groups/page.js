@@ -6,6 +6,8 @@ import { verifyUserIsTeacher } from '@/lib/auth'
 import { db } from '@/lib/firebase'
 import { collection, getDocs, addDoc, query, orderBy, limit } from 'firebase/firestore'
 import { toast } from 'react-hot-toast'
+import { DndProvider, useDrag, useDrop } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 const FUNNY_GROUP_NAMES = [
   {
@@ -90,6 +92,94 @@ const FUNNY_GROUP_NAMES = [
   }
 ]
 
+// Draggable student component
+const DraggableStudent = ({ student, groupId }) => {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: 'student',
+    item: { student, sourceGroupId: groupId },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging()
+    })
+  }))
+
+  return (
+    <div
+      ref={drag}
+      className={`p-2 rounded cursor-move transition-opacity duration-200 ${isDragging ? 'opacity-50' : 'opacity-100'}`}
+      style={{ 
+        backgroundColor: 'var(--card-background-secondary)',
+        borderColor: 'var(--card-border)',
+        border: '1px solid'
+      }}
+    >
+      {student.name}
+    </div>
+  )
+}
+
+// Droppable group component
+const DroppableGroup = ({ group, index, onDrop }) => {
+  const [{ isOver }, drop] = useDrop(() => ({
+    accept: 'student',
+    drop: (item) => onDrop(item.student, item.sourceGroupId, index),
+    collect: (monitor) => ({
+      isOver: monitor.isOver()
+    })
+  }))
+
+  return (
+    <div
+      ref={drop}
+      className={`p-6 rounded-lg transition-all duration-200 ${isOver ? 'ring-2' : ''}`}
+      style={{
+        backgroundColor: 'var(--card-background)',
+        borderColor: group.color,
+        border: '2px solid',
+        boxShadow: `0 4px 6px -1px ${group.color}20`,
+        ringColor: group.color
+      }}
+    >
+      <div className="flex flex-col mb-4">
+        <div className="flex justify-between items-center mb-1">
+          <h2 
+            className="text-xl font-semibold"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Group {index + 1}
+          </h2>
+          <span
+            className="text-sm px-2 py-1 rounded"
+            style={{ 
+              backgroundColor: group.color,
+              color: '#FFFFFF'
+            }}
+          >
+            {group.members.length} students
+          </span>
+        </div>
+        <h3 
+          className="text-lg italic"
+          style={{ 
+            color: group.color,
+            fontWeight: 600
+          }}
+        >
+          "{group.name}"
+        </h3>
+      </div>
+      <div className="space-y-2">
+        {group.members.map((student) => (
+          <DraggableStudent 
+            key={`${student.id}-${Math.random()}`}
+            student={student} 
+            groupId={index}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function ClassGroupsPage() {
   const [groupSize, setGroupSize] = useState(3)
   const [groups, setGroups] = useState([])
@@ -97,6 +187,7 @@ export default function ClassGroupsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isTeacher, setIsTeacher] = useState(false)
   const [savedGroups, setSavedGroups] = useState([])
+  const [unassignedStudents, setUnassignedStudents] = useState([])
   const router = useRouter()
 
   useEffect(() => {
@@ -172,6 +263,15 @@ export default function ClassGroupsPage() {
       loadSavedGroups()
     }
   }, [isTeacher])
+
+  // Update unassigned students whenever groups or allStudents change
+  useEffect(() => {
+    const assignedStudentIds = new Set(
+      groups.flatMap(group => group.members.map(student => student.id))
+    )
+    const unassigned = allStudents.filter(student => !assignedStudentIds.has(student.id))
+    setUnassignedStudents(unassigned)
+  }, [groups, allStudents])
 
   const generateGroups = async () => {
     try {
@@ -277,6 +377,74 @@ export default function ClassGroupsPage() {
     toast.success('Groups loaded successfully')
   }
 
+  const handleStudentDrop = (student, sourceGroupId, targetGroupId) => {
+    setGroups(prevGroups => {
+      const newGroups = [...prevGroups]
+      
+      // If moving from a group, remove from source group
+      if (sourceGroupId !== -1) {
+        newGroups[sourceGroupId].members = newGroups[sourceGroupId].members.filter(
+          s => s.id !== student.id
+        )
+      }
+      
+      // If moving to a group, add to target group (only if not already there)
+      if (targetGroupId !== -1) {
+        // Check if student is already in target group
+        const isAlreadyInTarget = newGroups[targetGroupId].members.some(
+          s => s.id === student.id
+        )
+        
+        // Only add if not already in target group
+        if (!isAlreadyInTarget) {
+          newGroups[targetGroupId].members.push(student)
+        }
+      }
+      
+      return newGroups
+    })
+  }
+
+  // Droppable unassigned students area
+  const UnassignedStudentsArea = () => {
+    const [{ isOver }, drop] = useDrop(() => ({
+      accept: 'student',
+      drop: (item) => handleStudentDrop(item.student, item.sourceGroupId, -1),
+      collect: (monitor) => ({
+        isOver: monitor.isOver()
+      })
+    }))
+
+    return (
+      <div 
+        ref={drop}
+        className={`p-4 rounded-lg ${isOver ? 'ring-2' : ''}`}
+        style={{
+          backgroundColor: 'var(--card-background)',
+          borderColor: 'var(--card-border)',
+          border: '1px solid',
+          ringColor: 'var(--text-accent)'
+        }}
+      >
+        <h2 
+          className="text-lg font-semibold mb-4"
+          style={{ color: 'var(--text-primary)' }}
+        >
+          Unassigned Students ({unassignedStudents.length})
+        </h2>
+        <div className="space-y-2">
+          {unassignedStudents.map((student) => (
+            <DraggableStudent 
+              key={`${student.id}-${Math.random()}`}
+              student={student} 
+              groupId={-1}
+            />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -290,231 +458,154 @@ export default function ClassGroupsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 
-        className="text-3xl font-bold mb-8"
-        style={{
-          background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}
-      >
-        Class Groups
-      </h1>
+    <DndProvider backend={HTML5Backend}>
+      <div className="container mx-auto px-4 py-8">
+        <h1 
+          className="text-3xl font-bold mb-8"
+          style={{
+            background: 'linear-gradient(to right, var(--text-accent), var(--color-secondary))',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}
+        >
+          Class Groups
+        </h1>
 
-      {/* Saved Groups Panel - Now at the top */}
-      <div 
-        className="mb-8 p-4 rounded-lg"
-        style={{
-          backgroundColor: 'var(--card-background)',
-          borderColor: 'var(--card-border)',
-          border: '1px solid'
-        }}
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h2 
-            className="text-lg font-semibold"
-            style={{ color: 'var(--text-primary)' }}
-          >
-            Saved Groups
-          </h2>
-          {groups.length > 0 && (
-            <button
-              onClick={saveCurrentGroups}
-              className="text-sm px-3 py-1 rounded"
-              style={{
-                backgroundColor: 'var(--text-accent)',
-                color: 'var(--color-dark)'
-              }}
+        {/* Saved Groups Panel */}
+        <div 
+          className="mb-8 p-4 rounded-lg"
+          style={{
+            backgroundColor: 'var(--card-background)',
+            borderColor: 'var(--card-border)',
+            border: '1px solid'
+          }}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h2 
+              className="text-lg font-semibold"
+              style={{ color: 'var(--text-primary)' }}
             >
-              Save Current
-            </button>
-          )}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {savedGroups.map((saved) => (
-            <div
-              key={saved.id}
-              className="text-sm p-3 rounded cursor-pointer transition-all duration-300 hover:scale-[1.02]"
-              style={{
-                backgroundColor: 'var(--card-background-secondary)',
-                border: '1px solid var(--card-border)'
-              }}
-              onClick={() => loadSavedGroup(saved)}
-            >
-              <div style={{ color: 'var(--text-secondary)' }}>
-                {formatDate(saved.timestamp)}
-              </div>
-              <div 
-                className="mt-1 flex justify-between items-center"
+              Saved Groups
+            </h2>
+            {groups.length > 0 && (
+              <button
+                onClick={saveCurrentGroups}
+                className="text-sm px-3 py-1 rounded"
+                style={{
+                  backgroundColor: 'var(--text-accent)',
+                  color: 'var(--color-dark)'
+                }}
               >
-                <span style={{ color: 'var(--text-primary)' }}>
-                  {saved.groups.length} groups, {saved.groupSize} students per group
-                </span>
+                Save Current
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {savedGroups.map((saved) => (
+              <div
+                key={saved.id}
+                className="p-3 rounded cursor-pointer hover:shadow-md transition-shadow"
+                style={{
+                  backgroundColor: 'var(--card-background-secondary)',
+                  border: '1px solid var(--card-border)'
+                }}
+                onClick={() => loadSavedGroup(saved)}
+              >
+                <div style={{ color: 'var(--text-secondary)' }}>
+                  {formatDate(saved.timestamp)}
+                </div>
+                <div className="mt-1 flex justify-between items-center">
+                  <span style={{ color: 'var(--text-primary)' }}>
+                    {saved.groups.length} groups, {saved.groupSize} students per group
+                  </span>
+                  <button
+                    className="text-xs px-2 py-1 rounded opacity-0 hover:opacity-100 transition-opacity duration-200"
+                    style={{
+                      backgroundColor: 'var(--text-accent)',
+                      color: 'var(--color-dark)'
+                    }}
+                  >
+                    Load
+                  </button>
+                </div>
+              </div>
+            ))}
+            {savedGroups.length === 0 && (
+              <div 
+                className="text-sm col-span-full text-center py-4"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                No saved groups yet
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Left side: Controls and Unassigned Students */}
+          <div className="lg:col-span-1">
+            <div className="mb-8">
+              <label 
+                className="block text-sm font-medium mb-2"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                Students per group:
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="number"
+                  min="2"
+                  max="10"
+                  value={groupSize || ''}
+                  onChange={(e) => {
+                    const value = e.target.value === '' ? '' : parseInt(e.target.value)
+                    setGroupSize(value === '' ? 3 : value)
+                  }}
+                  className="w-24 px-3 py-2 rounded-md"
+                  style={{
+                    backgroundColor: 'var(--input-background)',
+                    color: 'var(--text-primary)',
+                    borderColor: 'var(--card-border)',
+                    border: '1px solid'
+                  }}
+                />
                 <button
-                  className="text-xs px-2 py-1 rounded opacity-0 hover:opacity-100 transition-opacity duration-200"
+                  onClick={generateGroups}
+                  disabled={isLoading}
+                  className="px-4 py-2 rounded-lg font-medium transition-all duration-300"
                   style={{
                     backgroundColor: 'var(--text-accent)',
-                    color: 'var(--color-dark)'
+                    color: 'var(--color-dark)',
+                    opacity: isLoading ? 0.7 : 1,
+                    cursor: isLoading ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  Load
+                  Generate Groups
                 </button>
               </div>
             </div>
-          ))}
-          {savedGroups.length === 0 && (
-            <div 
-              className="text-sm col-span-full text-center py-4"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              No saved groups yet
-            </div>
-          )}
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Left side: Controls and Student List */}
-        <div className="lg:col-span-1">
-          <div className="mb-8">
-            <label 
-              className="block text-sm font-medium mb-2"
-              style={{ color: 'var(--text-primary)' }}
-            >
-              Students per group:
-            </label>
-            <div className="flex items-center gap-4">
-              <input
-                type="number"
-                min="2"
-                max="10"
-                value={groupSize || ''}
-                onChange={(e) => {
-                  const value = e.target.value === '' ? '' : parseInt(e.target.value)
-                  setGroupSize(value === '' ? 3 : value)
-                }}
-                className="w-24 px-3 py-2 rounded-md"
-                style={{
-                  backgroundColor: 'var(--input-background)',
-                  color: 'var(--text-primary)',
-                  borderColor: 'var(--card-border)',
-                  border: '1px solid'
-                }}
-              />
-              <button
-                onClick={generateGroups}
-                disabled={isLoading}
-                className="px-4 py-2 rounded-lg font-medium transition-all duration-300"
-                style={{
-                  backgroundColor: 'var(--text-accent)',
-                  color: 'var(--color-dark)',
-                  opacity: isLoading ? 0.7 : 1,
-                  cursor: isLoading ? 'not-allowed' : 'pointer'
-                }}
-              >
-                Generate Groups
-              </button>
-            </div>
+            {/* Unassigned Students */}
+            <UnassignedStudentsArea />
           </div>
 
-          {/* Student List */}
-          <div 
-            className="p-4 rounded-lg"
-            style={{
-              backgroundColor: 'var(--card-background)',
-              borderColor: 'var(--card-border)',
-              border: '1px solid'
-            }}
-          >
-            <h2 
-              className="text-lg font-semibold mb-4"
-              style={{ color: 'var(--text-primary)' }}
-            >
-              All Students ({allStudents.length})
-            </h2>
-            <ul className="space-y-2">
-              {allStudents.map((student) => (
-                <li
-                  key={student.id}
-                  className="flex items-center"
-                  style={{ 
-                    color: 'var(--text-primary)',
-                    textDecoration: isStudentAssigned(student.id) ? 'line-through' : 'none',
-                    opacity: isStudentAssigned(student.id) ? 0.5 : 1
-                  }}
-                >
-                  {student.name}
-                </li>
-              ))}
-            </ul>
+          {/* Right side: Groups Display */}
+          <div className="lg:col-span-3">
+            {groups.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {groups.map((group, index) => (
+                  <DroppableGroup
+                    key={index}
+                    group={group}
+                    index={index}
+                    onDrop={handleStudentDrop}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Right side: Groups Display */}
-        <div className="lg:col-span-3">
-          {groups.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {groups.map((group, index) => (
-                <div
-                  key={index}
-                  className="p-6 rounded-lg"
-                  style={{
-                    backgroundColor: 'var(--card-background)',
-                    borderColor: group.color,
-                    border: '2px solid',
-                    boxShadow: `0 4px 6px -1px ${group.color}20`
-                  }}
-                >
-                  <div className="flex flex-col mb-4">
-                    <div className="flex justify-between items-center mb-1">
-                      <h2 
-                        className="text-xl font-semibold"
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        Group {index + 1}
-                      </h2>
-                      <span
-                        className="text-sm px-2 py-1 rounded"
-                        style={{ 
-                          backgroundColor: group.color,
-                          color: '#FFFFFF'
-                        }}
-                      >
-                        {group.members.length} students
-                      </span>
-                    </div>
-                    <h3 
-                      className="text-lg italic"
-                      style={{ 
-                        color: group.color,
-                        fontWeight: 600
-                      }}
-                    >
-                      "{group.name}"
-                    </h3>
-                  </div>
-                  <ul className="space-y-2">
-                    {group.members.map((student) => (
-                      <li
-                        key={student.id}
-                        className="flex items-center"
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        <span
-                          className="w-2 h-2 rounded-full mr-2"
-                          style={{ backgroundColor: group.color }}
-                        />
-                        {student.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
-    </div>
+    </DndProvider>
   )
 } 
