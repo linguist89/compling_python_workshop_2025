@@ -46,8 +46,8 @@ export default function LessonsPage() {
           Python Programming Lessons
         </h1>
         
-        <div className="flex gap-8">
-          <div className="w-1/4">
+        <div className="flex flex-col md:flex-row gap-8">
+          <div className="w-full md:w-1/4">
             <LessonNavigation
               lessons={lessons}
               selectedLesson={selectedLesson}
@@ -55,7 +55,7 @@ export default function LessonsPage() {
             />
           </div>
           
-          <div className="w-3/4">
+          <div className="w-full md:w-3/4">
             <div 
               className="rounded-lg p-6"
               style={{
