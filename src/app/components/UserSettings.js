@@ -7,6 +7,9 @@ import ProgressBar from '@/app/components/ProgressBar'
 import CountrySelector from '@/app/components/CountrySelector'
 import Laptop from '@/app/components/Laptop'
 import { useRouter } from 'next/navigation'
+import { auth } from '@/lib/firebase'
+import { getUserData, createUser, updateUserData, deleteUserData } from '@/lib/userService'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const DEFAULT_FONT_SIZE = 16
 const DEFAULT_THEME = 'neon'
@@ -46,6 +49,9 @@ export default function UserSettings({ onClose }) {
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [confirmName, setConfirmName] = useState('')
+  const [userId, setUserId] = useState(null)
+  const [userType, setUserType] = useState('student')
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
   const { getProgress, getLessonProgress, resetProgress } = useProgress()
   
   // Use try-catch to handle potential theme context errors
@@ -63,59 +69,138 @@ export default function UserSettings({ onClose }) {
   const router = useRouter()
   const progress = getProgress()
 
-  useEffect(() => {
-    const savedName = localStorage.getItem('userName')
-    const savedFontSize = localStorage.getItem('fontSize')
-    const savedCountry = localStorage.getItem('userCountry')
-    if (savedName) setUserName(savedName)
-    if (savedFontSize) {
-      const size = parseInt(savedFontSize)
+  // Load data from localStorage
+  const loadFromLocalStorage = () => {
+    const savedData = localStorage.getItem('userDataPythonWorkshop')
+    if (savedData) {
+      const parsedData = JSON.parse(savedData)
+      setUserName(parsedData.userName || '')
+      const size = parsedData.fontSize || DEFAULT_FONT_SIZE
       setFontSize(size)
       document.documentElement.style.fontSize = `${size}px`
+      setSelectedCountry(parsedData.userCountry || null)
+      setUserType(parsedData.user_type || 'student')
     }
-    if (savedCountry) setSelectedCountry(JSON.parse(savedCountry))
-  }, [])
-
-  const handleNameChange = (e) => {
-    const newName = e.target.value
-    setUserName(newName)
-    localStorage.setItem('userName', newName)
   }
 
-  const handleCountrySelect = (country) => {
+  // Save data to localStorage and optionally to Firestore
+  const saveData = async (newData, updateFirestore = true) => {
+    // Get current data from localStorage
+    const currentData = localStorage.getItem('userDataPythonWorkshop')
+    const parsedCurrentData = currentData ? JSON.parse(currentData) : {
+      userName: '',
+      fontSize: DEFAULT_FONT_SIZE,
+      userCountry: null,
+      user_type: 'student'
+    }
+
+    // Merge new data with current data
+    const updatedData = {
+      ...parsedCurrentData,
+      ...newData
+    }
+
+    // Update localStorage
+    localStorage.setItem('userDataPythonWorkshop', JSON.stringify(updatedData))
+
+    // Update Firestore if needed
+    if (updateFirestore && userId) {
+      await updateUserData(userId, newData)
+    }
+  }
+
+  // Initial load effect
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setUserId(user.uid)
+        try {
+          // First load from localStorage for immediate display
+          loadFromLocalStorage()
+
+          // Then fetch from Firestore
+          let userData = await getUserData(user.uid)
+          if (!userData) {
+            // If no Firestore data exists, create it from localStorage
+            const localData = JSON.parse(localStorage.getItem('userDataPythonWorkshop') || '{}')
+            userData = await createUser(user.uid, localData)
+          } else {
+            // Create complete data object
+            const completeData = {
+              userName: userData.userName || '',
+              fontSize: userData.fontSize || DEFAULT_FONT_SIZE,
+              userCountry: userData.userCountry || null,
+              user_type: userData.user_type || 'student'
+            }
+
+            // Update localStorage with Firestore data
+            localStorage.setItem('userDataPythonWorkshop', JSON.stringify(completeData))
+
+            // Update state
+            setUserName(completeData.userName)
+            setFontSize(completeData.fontSize)
+            setSelectedCountry(completeData.userCountry)
+            setUserType(completeData.user_type)
+            document.documentElement.style.fontSize = `${completeData.fontSize}px`
+          }
+        } catch (error) {
+          console.error('Error loading user data:', error)
+          // Fallback to localStorage if Firestore fails
+          loadFromLocalStorage()
+        }
+      }
+      setIsInitialLoad(false)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const handleNameChange = async (e) => {
+    const newName = e.target.value
+    setUserName(newName)
+    await saveData({ userName: newName })
+  }
+
+  const handleCountrySelect = async (country) => {
     setSelectedCountry(country)
-    localStorage.setItem('userCountry', JSON.stringify(country))
+    await saveData({ userCountry: country })
   }
 
   const handleDeleteData = () => {
     setShowDeleteConfirm(true)
   }
 
-  const handleConfirmDelete = () => {
-    if (confirmName === userName) {
-      // Reset all data
-      localStorage.removeItem('userName')
-      localStorage.removeItem('fontSize')
-      localStorage.removeItem('userCountry')
-      resetProgress()
-      
-      // Reset states
-      setUserName('')
-      setFontSize(DEFAULT_FONT_SIZE)
-      setSelectedCountry(null)
-      setShowDeleteConfirm(false)
-      setConfirmName('')
-      
-      // Reset font size and theme to default
-      document.documentElement.style.fontSize = `${DEFAULT_FONT_SIZE}px`
-      updateTheme(DEFAULT_THEME)
+  const handleConfirmDelete = async () => {
+    if (confirmName === userName && userId) {
+      try {
+        // Clear localStorage
+        localStorage.removeItem('userDataPythonWorkshop')
 
-      // Navigate to home and refresh if we're on the personalize page
-      if (window.location.pathname === '/personalize') {
-        router.push('/')
-        setTimeout(() => {
-          window.location.reload()
-        }, 100)
+        // Reset Firestore data
+        await deleteUserData(userId)
+        
+        // Reset states
+        setUserName('')
+        setFontSize(DEFAULT_FONT_SIZE)
+        setSelectedCountry(null)
+        setShowDeleteConfirm(false)
+        setConfirmName('')
+        setUserType('student')
+        
+        // Reset font size and theme to default
+        document.documentElement.style.fontSize = `${DEFAULT_FONT_SIZE}px`
+        updateTheme(DEFAULT_THEME)
+        resetProgress()
+
+        // Navigate to home and refresh if we're on the personalize page
+        if (window.location.pathname === '/personalize') {
+          router.push('/')
+          setTimeout(() => {
+            window.location.reload()
+          }, 100)
+        }
+      } catch (error) {
+        console.error('Error deleting user data:', error)
       }
     }
   }
@@ -132,18 +217,30 @@ export default function UserSettings({ onClose }) {
     }
   }
 
-  const adjustFontSize = (change) => {
+  const adjustFontSize = async (change) => {
     const newSize = Math.max(12, Math.min(24, fontSize + change))
     setFontSize(newSize)
     document.documentElement.style.fontSize = `${newSize}px`
-    localStorage.setItem('fontSize', newSize.toString())
+    await saveData({ fontSize: newSize })
   }
 
-  const resetToDefaults = () => {
-    // Reset font size
+  const resetToDefaults = async () => {
+    const defaultData = {
+      fontSize: DEFAULT_FONT_SIZE,
+      userName: '',
+      userCountry: null,
+      user_type: 'student'
+    }
+
+    // Update state
     setFontSize(DEFAULT_FONT_SIZE)
+    setUserName('')
+    setSelectedCountry(null)
+    setUserType('student')
     document.documentElement.style.fontSize = `${DEFAULT_FONT_SIZE}px`
-    localStorage.setItem('fontSize', DEFAULT_FONT_SIZE.toString())
+
+    // Save to localStorage and Firestore
+    await saveData(defaultData)
     
     // Reset theme
     updateTheme(DEFAULT_THEME)

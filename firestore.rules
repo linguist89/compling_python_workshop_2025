@@ -1,0 +1,13 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if true;  // This allows anyone to read and write to the users collection
+    }
+    
+    match /{document=**} {
+      allow read, write: if false;  // This denies access to all other collections
+    }
+  }
+} 

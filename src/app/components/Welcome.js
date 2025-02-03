@@ -8,9 +8,12 @@ export default function Welcome() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const savedName = localStorage.getItem('userName')
-    if (savedName) {
-      setName(savedName)
+    const savedData = localStorage.getItem('userDataPythonWorkshop')
+    if (savedData) {
+      const parsedData = JSON.parse(savedData)
+      if (parsedData.userName) {
+        setName(parsedData.userName)
+      }
     }
   }, [])
 
@@ -44,19 +47,10 @@ export default function Welcome() {
 
   return (
     <div 
-      className="rounded-lg p-4 mb-8 border transition-all duration-300"
-      style={{ 
-        backgroundColor: 'var(--card-background)',
-        borderColor: 'var(--card-border)',
-        boxShadow: 'var(--card-shadow)'
-      }}
+      className="text-lg font-medium mb-6"
+      style={{ color: 'var(--text-primary)' }}
     >
-      <p 
-        className="text-lg"
-        style={{ color: 'var(--text-primary)' }}
-      >
-        {getWelcomeMessage()}
-      </p>
+      {getWelcomeMessage()}
     </div>
   )
 } 

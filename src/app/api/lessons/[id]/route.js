@@ -25,34 +25,26 @@ const getAllLessons = () => {
 };
 
 export async function GET(request, { params }) {
-  const { id } = params;
-  
-  // If id is 'all', return all lessons
-  if (id === 'all') {
-    try {
+  try {
+    const { id } = params;  // No need to await, params is synchronously available
+    
+    // If id is 'all', return all lessons
+    if (id === 'all') {
       const lessons = getAllLessons();
       return NextResponse.json({ lessons });
-    } catch (error) {
-      console.error('Error reading lesson files:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch lessons' },
-        { status: 500 }
-      );
     }
-  }
-  
-  // Otherwise, return a single lesson
-  try {
+    
+    // Otherwise, return a single lesson
     const filePath = path.join(process.cwd(), 'markdownContent', 'lessons', `${id}.md`);
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const { content } = matter(fileContent);
     
     return NextResponse.json({ content });
   } catch (error) {
-    console.error(`Error reading markdown file ${id}:`, error);
+    console.error(`Error in lessons API:`, error);
     return NextResponse.json(
-      { error: 'Lesson not found' },
-      { status: 404 }
+      { error: error.message || 'Failed to fetch lesson' },
+      { status: error.code === 'ENOENT' ? 404 : 500 }
     );
   }
 } 

@@ -8,10 +8,16 @@ export default function UserNameWithFlag({ className = '' }) {
   const [selectedCountry, setSelectedCountry] = useState(null)
 
   useEffect(() => {
-    const savedName = localStorage.getItem('userName')
-    const savedCountry = localStorage.getItem('userCountry')
-    if (savedName) setUserName(savedName)
-    if (savedCountry) setSelectedCountry(JSON.parse(savedCountry))
+    const savedData = localStorage.getItem('userDataPythonWorkshop')
+    if (savedData) {
+      const parsedData = JSON.parse(savedData)
+      if (parsedData.userName) {
+        setUserName(parsedData.userName)
+      }
+      if (parsedData.userCountry) {
+        setSelectedCountry(parsedData.userCountry)
+      }
+    }
   }, [])
 
   if (!userName) return null
