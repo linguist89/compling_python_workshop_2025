@@ -1,7 +1,7 @@
 'use client'
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 
 export const ProgressContext = createContext();
 
@@ -24,26 +24,71 @@ export function ProgressProvider({ children }) {
 
   useEffect(() => {
     // Load progress from userDataPythonWorkshop on mount
-    const savedData = localStorage.getItem('userDataPythonWorkshop');
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        if (parsedData.userName) {
-          setUserName(parsedData.userName);
+    const loadData = async () => {
+      const savedData = localStorage.getItem('userDataPythonWorkshop');
+      let parsedData = {};
+      
+      if (savedData) {
+        try {
+          parsedData = JSON.parse(savedData);
+          if (parsedData.userName) {
+            setUserName(parsedData.userName);
+          }
+        } catch (e) {
+          console.error('Error parsing saved progress:', e);
         }
-        if (parsedData.progress) {
-          setProgress(prev => ({
-            ...parsedData.progress,
-            hasReachedCompletion: parsedData.progress.hasReachedCompletion || false
-          }));
-        } else {
-          setProgress(initialProgressState);
+      }
+
+      // If we have a username but no progress data in localStorage, fetch from Firestore
+      if (parsedData.userName && !parsedData.progress) {
+        try {
+          const userDoc = doc(db, 'users', parsedData.userName);
+          const userSnapshot = await getDoc(userDoc);
+          
+          if (userSnapshot.exists()) {
+            const firestoreData = userSnapshot.data();
+            
+            // Update localStorage with the Firestore data (excluding sensitive info)
+            const updatedData = {
+              ...parsedData,
+              progress: firestoreData.progress,
+              fontSize: firestoreData.fontSize,
+              userCountry: firestoreData.userCountry,
+              user_type: firestoreData.user_type,
+              quizDone: firestoreData.quizDone,
+              quizScore: firestoreData.quizScore,
+              quizCompletedAt: firestoreData.quizCompletedAt,
+              overallQuizScore: firestoreData.overallQuizScore
+            };
+            
+            localStorage.setItem('userDataPythonWorkshop', JSON.stringify(updatedData));
+            
+            // Update progress state
+            if (firestoreData.progress) {
+              setProgress(prev => ({
+                ...firestoreData.progress,
+                hasReachedCompletion: firestoreData.progress.hasReachedCompletion || false
+              }));
+              return;
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching Firestore data:', error);
         }
-      } catch (e) {
-        console.error('Error parsing saved progress:', e);
+      }
+
+      // If we have progress in localStorage or Firestore fetch failed, use localStorage data
+      if (parsedData.progress) {
+        setProgress(prev => ({
+          ...parsedData.progress,
+          hasReachedCompletion: parsedData.progress.hasReachedCompletion || false
+        }));
+      } else {
         setProgress(initialProgressState);
       }
-    }
+    };
+
+    loadData();
   }, []);
 
   const saveProgress = useCallback(async (newProgress) => {
@@ -194,6 +239,14 @@ export function ProgressProvider({ children }) {
     };
     setProgress(newProgress);
     saveProgress(newProgress);
+
+    // Also clear the hasShownComplete flag from localStorage
+    const savedData = localStorage.getItem('userDataPythonWorkshop');
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      delete parsedData.hasShownComplete;
+      localStorage.setItem('userDataPythonWorkshop', JSON.stringify(parsedData));
+    }
   }, [saveProgress]);
 
   const registerCompletionCallback = useCallback((callback) => {
