@@ -1,6 +1,8 @@
+'use client'
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import remarkGfm from 'remark-gfm';
+import AnimatedCodeBlock from '@/app/components/AnimatedCodeBlock';
 
 export default function LessonContent({ content }) {
   return (
@@ -29,6 +31,33 @@ export default function LessonContent({ content }) {
               );
             }
 
+            // Use AnimatedCodeBlock for Python code blocks
+            if (language === 'python') {
+              // Get the previous sibling's text as description if it exists
+              let description = '';
+              if (node.position && content) {
+                const lines = content.split('\n');
+                const codeBlockStart = node.position.start.line - 1;
+                
+                // Look for description in previous lines
+                for (let i = codeBlockStart - 1; i >= 0; i--) {
+                  const line = lines[i].trim();
+                  if (line === '') break; // Stop at empty line
+                  if (!line.startsWith('#') && !line.startsWith('```')) {
+                    description = line + '\n' + description;
+                  }
+                }
+              }
+
+              return (
+                <AnimatedCodeBlock 
+                  code={String(children).replace(/\n$/, '')}
+                  description={description.trim()}
+                />
+              );
+            }
+
+            // Use regular SyntaxHighlighter for other languages
             return (
               <SyntaxHighlighter
                 language={language}
