@@ -21,6 +21,7 @@ export const createUser = async (userId, userData) => {
       fontSize: 16,
       userCountry: null,
       user_type: 'student',
+      hasShownComplete: false,
       ...userData
     };
     await setDoc(doc(db, 'users', userId), defaultData);
@@ -46,7 +47,8 @@ export const deleteUserData = async (userId) => {
       userName: '',
       fontSize: 16,
       userCountry: null,
-      user_type: 'student'
+      user_type: 'student',
+      hasShownComplete: false
     });
   } catch (error) {
     console.error('Error deleting user data:', error);

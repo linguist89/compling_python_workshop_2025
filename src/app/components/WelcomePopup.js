@@ -73,7 +73,8 @@ export default function WelcomePopup() {
           userName: name.trim(),
           fontSize: 16,
           userCountry: selectedCountry,
-          user_type: userType
+          user_type: userType,
+          hasShownComplete: false
         }
         localStorage.setItem('userDataPythonWorkshop', JSON.stringify(localData))
         
@@ -111,7 +112,8 @@ export default function WelcomePopup() {
           userName: name.trim(),
           fontSize: userData.fontSize || 16,
           userCountry: userData.userCountry,
-          user_type: userData.user_type || 'student'
+          user_type: userData.user_type || 'student',
+          hasShownComplete: userData.hasShownComplete || false
         }
         localStorage.setItem('userDataPythonWorkshop', JSON.stringify(localData))
         

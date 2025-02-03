@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Laptop from './Laptop'
 import { useProgress } from '../contexts/ProgressContext'
 import { useState, useEffect } from 'react'
+import GenerateTestDataPopup from './GenerateTestDataPopup'
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -13,12 +14,15 @@ export default function Navbar() {
   const progress = getProgress()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [quizDone, setQuizDone] = useState(false)
+  const [isTeacher, setIsTeacher] = useState(false)
+  const [showTestDataPopup, setShowTestDataPopup] = useState(false)
 
   useEffect(() => {
     const savedData = localStorage.getItem('userDataPythonWorkshop')
     if (savedData) {
       const parsedData = JSON.parse(savedData)
       setQuizDone(parsedData.quizDone || false)
+      setIsTeacher(parsedData.user_type === 'teacher')
     }
   }, [pathname]) // Re-check when pathname changes
 
@@ -124,6 +128,14 @@ export default function Navbar() {
             >
               Settings
             </Link>
+            {isTeacher && (
+              <button
+                onClick={() => setShowTestDataPopup(true)}
+                className="transition-colors duration-300 text-blue-500 hover:text-blue-600"
+              >
+                Generate Test Data
+              </button>
+            )}
           </div>
 
           {/* Hamburger Menu Button */}
@@ -216,8 +228,26 @@ export default function Navbar() {
                 {Math.min(progress || 0, 100)}% Complete
               </div>
             </div>
+
+            {isTeacher && (
+              <button
+                onClick={() => {
+                  setShowTestDataPopup(true)
+                  setIsMenuOpen(false)
+                }}
+                className="block w-full text-left px-4 py-2 transition-colors duration-300 text-blue-500 hover:text-blue-600"
+              >
+                Generate Test Data
+              </button>
+            )}
           </div>
         </div>
+
+        {/* Test Data Generation Popup */}
+        <GenerateTestDataPopup
+          isOpen={showTestDataPopup}
+          onClose={() => setShowTestDataPopup(false)}
+        />
       </div>
     </nav>
   )

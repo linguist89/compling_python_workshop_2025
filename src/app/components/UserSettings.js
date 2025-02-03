@@ -229,7 +229,8 @@ export default function UserSettings({ onClose }) {
       fontSize: DEFAULT_FONT_SIZE,
       userName: '',
       userCountry: null,
-      user_type: 'student'
+      user_type: 'student',
+      hasShownComplete: false
     }
 
     // Update state

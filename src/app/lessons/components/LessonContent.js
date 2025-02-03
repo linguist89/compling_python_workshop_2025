@@ -56,13 +56,18 @@ export default function LessonContent({ content, lessonId }) {
 
   // Show popup only when first reaching 100%
   useEffect(() => {
-    // Check if we've shown the popup before
-    const hasShownPopup = localStorage.getItem('hasShownCompletionPopup');
+    // Get user data from localStorage
+    const savedData = localStorage.getItem('userDataPythonWorkshop');
+    const userData = savedData ? JSON.parse(savedData) : {};
     
     // Only show popup if we just reached completion and haven't shown it before
-    if (progress?.hasReachedCompletion && !hasShownPopup) {
+    if (progress?.hasReachedCompletion && !userData.hasShownComplete) {
       setShowLaptopPopup(true);
-      localStorage.setItem('hasShownCompletionPopup', 'true');
+      // Update userDataPythonWorkshop with hasShownComplete
+      localStorage.setItem('userDataPythonWorkshop', JSON.stringify({
+        ...userData,
+        hasShownComplete: true
+      }));
     }
   }, [progress?.hasReachedCompletion]);
 
