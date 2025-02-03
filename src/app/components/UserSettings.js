@@ -396,8 +396,33 @@ export default function UserSettings({ onClose }) {
               <p className="text-xl">This is larger paragraph text that might be used for important information or introductions.</p>
               <p className="text-base">This is standard paragraph text used throughout the site. It should be comfortable to read and provide good contrast.</p>
               <p className="text-sm">This is smaller text that might be used for captions, notes, or less important information.</p>
+              <span className="block text-base">
+                <span 
+                  className="block bg-opacity-20 rounded-lg p-4 overflow-x-auto font-mono" 
+                  style={{ 
+                    backgroundColor: 'var(--text-accent)20',
+                    fontSize: `${fontSize}px`
+                  }}
+                >
+{`# Python code example
+def greet(name: str) -> str:
+    """Return a personalized greeting."""
+    return f"Hello, {name}!"
+
+# Call the function
+message = greet("Learner")
+print(message)  # Output: Hello, Learner!`}
+                </span>
+                <span className="block mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>Code blocks will adjust with text size</span>
+              </span>
               <div className="text-xs">
-                <code className="bg-opacity-20 rounded px-1" style={{ backgroundColor: 'var(--text-accent)20' }}>
+                <code 
+                  className="bg-opacity-20 rounded px-1" 
+                  style={{ 
+                    backgroundColor: 'var(--text-accent)20',
+                    fontSize: `${fontSize}px`
+                  }}
+                >
                   This is code or technical text
                 </code>
               </div>

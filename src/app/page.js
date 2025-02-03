@@ -174,7 +174,7 @@ export default function Home() {
             Ready to Start Your Python Journey?
           </h2>
           <a
-            href="/lessons/1"
+            href="/lessons"
             className="inline-block px-8 py-3 rounded-lg text-lg font-medium transition-all duration-300"
             style={{
               backgroundColor: 'var(--card-background)',
