@@ -12,7 +12,7 @@ import GenerateTestDataPopup from './GenerateTestDataPopup'
 export default function Navbar() {
   const pathname = usePathname()
   const { getProgress } = useProgress()
-  const { currentTheme, updateTheme } = useTheme()
+  const { currentTheme = { isDark: true }, updateTheme = () => {} } = useTheme() || {}
   const progress = getProgress()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [quizDone, setQuizDone] = useState(false)
@@ -152,7 +152,7 @@ export default function Navbar() {
             )}
             {/* Theme Toggle Button */}
             <button
-              onClick={() => updateTheme(currentTheme?.isDark ? 'daylight' : 'neon')}
+              onClick={() => updateTheme?.(currentTheme?.isDark ? 'daylight' : 'neon')}
               className="p-2 rounded-lg transition-colors duration-300 hover:bg-opacity-10"
               style={{
                 backgroundColor: 'var(--interactive-hover)',
@@ -265,7 +265,7 @@ export default function Navbar() {
 
             {/* Mobile Theme Toggle */}
             <button
-              onClick={() => updateTheme(currentTheme?.isDark ? 'daylight' : 'neon')}
+              onClick={() => updateTheme?.(currentTheme?.isDark ? 'daylight' : 'neon')}
               className="w-full flex items-center justify-between px-4 py-2 transition-colors duration-300"
               style={{
                 color: 'var(--text-primary)',
