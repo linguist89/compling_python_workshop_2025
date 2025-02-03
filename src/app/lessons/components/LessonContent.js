@@ -11,7 +11,6 @@ export default function LessonContent({ content, lessonId }) {
   const { markSectionComplete, setTotalSections, progress, getProgress } = useContext(ProgressContext);
   const [expandedSections, setExpandedSections] = useState({});
   const [showLaptopPopup, setShowLaptopPopup] = useState(false);
-  const [currentProgress, setCurrentProgress] = useState(0);
   
   // Split content into main content and sections
   const { mainContent, sections } = useMemo(() => {
@@ -51,16 +50,17 @@ export default function LessonContent({ content, lessonId }) {
     setTotalSections(lessonId, sections.length);
   }, [content, lessonId, setTotalSections, sections.length]);
 
-  // Track progress and show popup when reaching 100%
+  // Show popup only when first reaching 100%
   useEffect(() => {
-    const totalProgress = getProgress();
-    setCurrentProgress(totalProgress);
+    // Check if we've shown the popup before
+    const hasShownPopup = localStorage.getItem('hasShownCompletionPopup');
     
-    // Show popup if we just reached 100%
-    if (totalProgress === 100 && currentProgress < 100) {
+    // Only show popup if we just reached completion and haven't shown it before
+    if (progress?.hasReachedCompletion && !hasShownPopup) {
       setShowLaptopPopup(true);
+      localStorage.setItem('hasShownCompletionPopup', 'true');
     }
-  }, [getProgress, progress, currentProgress]);
+  }, [progress?.hasReachedCompletion]);
 
   const completedSections = progress?.lessons?.[lessonId]?.completedSections || 0;
 
@@ -269,7 +269,7 @@ export default function LessonContent({ content, lessonId }) {
       {/* Laptop Popup */}
       <LaptopPopup 
         show={showLaptopPopup}
-        progress={currentProgress}
+        progress={getProgress()}
         onClose={() => setShowLaptopPopup(false)}
       />
     </>
