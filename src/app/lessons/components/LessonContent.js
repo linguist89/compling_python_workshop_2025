@@ -93,11 +93,12 @@ export default function LessonContent({ content, lessonId }) {
                     <code 
                       className={className}
                       style={{
-                        backgroundColor: 'var(--card-background)',
-                        color: 'var(--text-primary)',
+                        backgroundColor: 'var(--inline-code-bg)',
+                        color: 'var(--inline-code-color)',
                         padding: '0.2em 0.4em',
                         borderRadius: '0.2em',
-                        fontSize: '0.9em'
+                        fontSize: '0.9em',
+                        fontWeight: '500'
                       }}
                       {...props}
                     >
@@ -107,30 +108,31 @@ export default function LessonContent({ content, lessonId }) {
                 }
 
                 return (
-                  <div className="relative rounded-lg overflow-hidden my-4">
-                    <SyntaxHighlighter
-                      language={language}
-                      style={currentTheme?.isDark ? vscDarkPlus : oneLight}
-                      customStyle={{
-                        margin: 0,
-                        borderRadius: '0.5rem',
-                        fontSize: '0.9em',
-                        lineHeight: '1.5',
-                        backgroundColor: 'var(--card-background)'
-                      }}
-                      showLineNumbers={true}
-                      wrapLines={true}
-                      {...props}
-                    >
-                      {codeContent}
-                    </SyntaxHighlighter>
-                  </div>
+                  <SyntaxHighlighter
+                    language={language}
+                    style={currentTheme?.isDark ? vscDarkPlus : oneLight}
+                    customStyle={{
+                      margin: '0.5rem 0',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.9em',
+                      lineHeight: '1.5',
+                      backgroundColor: 'var(--lesson-card-background)',
+                      border: '1px solid var(--card-border)',
+                      padding: '0.75rem',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                    }}
+                    showLineNumbers={true}
+                    wrapLines={true}
+                    {...props}
+                  >
+                    {codeContent}
+                  </SyntaxHighlighter>
                 );
               },
               h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)' }}>{children}</h1>,
               h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)' }}>{children}</h3>,
               h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)' }}>{children}</h4>,
-              p: ({ children }) => <p style={{ color: 'var(--text-primary)' }}>{children}</p>,
+              p: ({ children }) => <p style={{ color: 'var(--text-primary)', marginTop: '2rem' }}>{children}</p>,
               li: ({ children }) => <li style={{ color: 'var(--text-primary)' }}>{children}</li>,
               strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
               em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>
@@ -150,7 +152,7 @@ export default function LessonContent({ content, lessonId }) {
               key={index}
               className="rounded-lg overflow-hidden border border-gray-700"
               style={{
-                backgroundColor: 'var(--card-background)',
+                backgroundColor: 'var(--lesson-background)',
                 borderColor: 'var(--card-border)'
               }}
             >
@@ -159,7 +161,7 @@ export default function LessonContent({ content, lessonId }) {
                 onClick={() => toggleSection(index)}
                 className="w-full border-b p-4 flex items-center justify-between cursor-pointer hover:bg-opacity-50 transition-colors"
                 style={{
-                  backgroundColor: 'var(--card-background)',
+                  backgroundColor: 'var(--lesson-background)',
                   borderColor: 'var(--card-border)'
                 }}
               >
@@ -206,8 +208,8 @@ export default function LessonContent({ content, lessonId }) {
                   isExpanded ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
                 }`}
               >
-                <div className="p-6">
-                  <div className="prose prose-invert max-w-none" style={{ color: 'var(--text-primary)' }}>
+                <div className="p-4">
+                  <div className="" style={{ color: 'var(--text-primary)' }}>
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
@@ -222,11 +224,12 @@ export default function LessonContent({ content, lessonId }) {
                               <code 
                                 className={className}
                                 style={{
-                                  backgroundColor: 'var(--card-background)',
-                                  color: 'var(--text-primary)',
+                                  backgroundColor: 'var(--inline-code-bg)',
+                                  color: 'var(--inline-code-color)',
                                   padding: '0.2em 0.4em',
                                   borderRadius: '0.2em',
-                                  fontSize: '0.9em'
+                                  fontSize: '0.9em',
+                                  fontWeight: '500'
                                 }}
                                 {...props}
                               >
@@ -236,30 +239,31 @@ export default function LessonContent({ content, lessonId }) {
                           }
 
                           return (
-                            <div className="relative rounded-lg overflow-hidden my-4">
-                              <SyntaxHighlighter
-                                language={language}
-                                style={currentTheme?.isDark ? vscDarkPlus : oneLight}
-                                customStyle={{
-                                  margin: 0,
-                                  borderRadius: '0.5rem',
-                                  fontSize: '0.9em',
-                                  lineHeight: '1.5',
-                                  backgroundColor: 'var(--card-background)'
-                                }}
-                                showLineNumbers={true}
-                                wrapLines={true}
-                                {...props}
-                              >
-                                {codeContent}
-                              </SyntaxHighlighter>
-                            </div>
+                            <SyntaxHighlighter
+                              language={language}
+                              style={currentTheme?.isDark ? vscDarkPlus : oneLight}
+                              customStyle={{
+                                margin: '0.5rem 0',
+                                borderRadius: '0.5rem',
+                                fontSize: '0.9em',
+                                lineHeight: '1.5',
+                                backgroundColor: 'var(--lesson-card-background)',
+                                border: '1px solid var(--card-border)',
+                                padding: '0.75rem',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                              }}
+                              showLineNumbers={true}
+                              wrapLines={true}
+                              {...props}
+                            >
+                              {codeContent}
+                            </SyntaxHighlighter>
                           );
                         },
                         h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)' }}>{children}</h1>,
                         h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)' }}>{children}</h3>,
                         h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)' }}>{children}</h4>,
-                        p: ({ children }) => <p style={{ color: 'var(--text-primary)' }}>{children}</p>,
+                        p: ({ children }) => <p style={{ color: 'var(--text-primary)', marginTop: '2rem' }}>{children}</p>,
                         li: ({ children }) => <li style={{ color: 'var(--text-primary)' }}>{children}</li>,
                         strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
                         em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>

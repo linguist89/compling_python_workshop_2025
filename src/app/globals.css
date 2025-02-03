@@ -43,6 +43,8 @@
   --interactive-active: #1D4ED8;
   --interactive-focus: #3B82F6;
   --interactive-disabled: #94A3B8;
+  --lesson-background: #FFFFFF;
+  --lesson-card-background: #f7f7f7;
   --card-background: #FFFFFF;
   --card-background-light: #F8FAFC;
   --card-border: #E2E8F0;
@@ -57,6 +59,8 @@
   --gradient-background: linear-gradient(135deg, #F8FAFC, #EFF6FF);
   --gradient-card: linear-gradient(135deg, #FFFFFF, #F8FAFC);
   --gradient-hover: linear-gradient(135deg, #2563EB, #1D4ED8);
+  --inline-code-bg: #E2E8F0;
+  --inline-code-color: #1E293B;
 }
 
 /* Dark theme overrides */
@@ -75,6 +79,8 @@
   --interactive-active: #00FFFF;
   --interactive-focus: #FFC107;
   --interactive-disabled: #4D5B5B;
+  --lesson-background: #0A192F;
+  --lesson-card-background: #0D1B2A;
   --card-background: #0D1B2A;
   --card-background-light: #0F172A;
   --card-border: #00E6E620;
@@ -89,6 +95,8 @@
   --gradient-background: linear-gradient(to right, #0A192F, #050B18);
   --gradient-card: linear-gradient(to right, #0D1B2A, #0A192F);
   --gradient-hover: linear-gradient(to right, #00E6E6, #00FFFF);
+  --inline-code-bg: #1E293B;
+  --inline-code-color: #E6FFFF;
 }
 
 @layer base {
