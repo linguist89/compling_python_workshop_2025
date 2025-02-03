@@ -1,8 +1,8 @@
 'use client'
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
-import SimplifiedAnimatedCodeBlock from '@/app/components/SimplifiedAnimatedCodeBlock';
 
 export default function LessonContent({ content }) {
   return (
@@ -13,20 +13,18 @@ export default function LessonContent({ content }) {
           code({ node, inline, className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || '');
             const language = match ? match[1] : 'text';
+            const codeContent = String(children).replace(/\n$/, '');
             
-            if (inline) {
+            // Handle all inline code and single-line code blocks the same way
+            if (inline || !codeContent.includes('\n')) {
               return (
-                <code
+                <code 
                   className={className}
                   style={{
-                    backgroundColor: 'var(--color-secondary)',
+                    backgroundColor: '#2d2d2d',
                     padding: '0.2em 0.4em',
-                    borderRadius: '0.25em',
-                    fontSize: '0.875em',
-                    display: 'inline-block',
-                    verticalAlign: 'middle',
-                    lineHeight: '1.4',
-                    margin: '0 0.2em'
+                    borderRadius: '0.2em',
+                    fontSize: '0.9em'
                   }}
                   {...props}
                 >
@@ -35,93 +33,27 @@ export default function LessonContent({ content }) {
               );
             }
 
-            // Use SimplifiedAnimatedCodeBlock for Python code blocks
-            if (language === 'python') {
-              return (
-                <SimplifiedAnimatedCodeBlock 
-                  code={String(children).replace(/\n$/, '')}
-                />
-              );
-            }
-
-            // Use regular SyntaxHighlighter for other languages
+            // Only use SyntaxHighlighter for multi-line code blocks
             return (
-              <SyntaxHighlighter
-                language={language}
-                PreTag="pre"
-                style={{
-                  margin: 0,
-                  backgroundColor: 'var(--color-secondary)',
-                  padding: '1em',
-                  borderRadius: '0.5rem',
-                }}
-                {...props}
-              >
-                {String(children).replace(/\n$/, '')}
-              </SyntaxHighlighter>
+              <div className="relative rounded-lg overflow-hidden my-4">
+                <SyntaxHighlighter
+                  language={language}
+                  style={vscDarkPlus}
+                  customStyle={{
+                    margin: 0,
+                    borderRadius: '0.5rem',
+                    fontSize: '0.9em',
+                    lineHeight: '1.5'
+                  }}
+                  showLineNumbers={true}
+                  wrapLines={true}
+                  {...props}
+                >
+                  {codeContent}
+                </SyntaxHighlighter>
+              </div>
             );
-          },
-          // Style other markdown elements
-          h1: ({ children }) => (
-            <h1 style={{ color: 'var(--text-accent)' }} className="text-3xl font-bold mb-4">
-              {children}
-            </h1>
-          ),
-          h2: ({ children }) => (
-            <h2 style={{ color: 'var(--text-accent)' }} className="text-2xl font-bold mt-8 mb-4">
-              {children}
-            </h2>
-          ),
-          h3: ({ children }) => (
-            <h3 style={{ color: 'var(--text-accent)' }} className="text-xl font-semibold mt-6 mb-3">
-              {children}
-            </h3>
-          ),
-          p: ({ children, ...props }) => {
-            // Check if the children is a pre element (code block)
-            if (children && typeof children === 'object' && children.type === 'pre') {
-              return children; // Return the code block directly without wrapping in p
-            }
-            return (
-              <p 
-                style={{ 
-                  color: 'var(--text-secondary)',
-                  lineHeight: '1.8'
-                }} 
-                className="mb-4 flex items-center flex-wrap gap-1" 
-                {...props}
-              >
-                {children}
-              </p>
-            );
-          },
-          ul: ({ children }) => (
-            <ul style={{ color: 'var(--text-secondary)' }} className="list-disc pl-6 mb-4">
-              {children}
-            </ul>
-          ),
-          ol: ({ children }) => (
-            <ol style={{ color: 'var(--text-secondary)' }} className="list-decimal pl-6 mb-4">
-              {children}
-            </ol>
-          ),
-          li: ({ children }) => (
-            <li className="mb-2">
-              {children}
-            </li>
-          ),
-          blockquote: ({ children }) => (
-            <blockquote
-              style={{
-                borderLeftColor: 'var(--text-accent)',
-                backgroundColor: 'var(--color-secondary)',
-                color: 'var(--text-secondary)'
-              }}
-              className="pl-4 py-2 border-l-4 mb-4"
-            >
-              {children}
-            </blockquote>
-          ),
+          }
         }}
       >
         {content}

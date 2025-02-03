@@ -47,6 +47,42 @@ const SimplifiedAnimatedCodeBlock = ({ code }) => {
     return '#d4d4d4'
   }
 
+  // Process text to combine related lines into paragraphs
+  const processText = (text) => {
+    const lines = text.split('\n')
+    const processedLines = []
+    let currentParagraph = []
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
+      const nextLine = lines[i + 1]
+      
+      // If the current line is not empty and either:
+      // 1. The next line exists and is not empty
+      // 2. The current line doesn't end with a special character
+      if (line.trim() && 
+          ((nextLine && nextLine.trim() && !line.trim().endsWith(':')) || 
+           (!line.trim().endsWith(':') && !line.trim().endsWith('.')))) {
+        currentParagraph.push(line)
+      } else {
+        if (currentParagraph.length > 0) {
+          currentParagraph.push(line)
+          processedLines.push(currentParagraph.join(' '))
+          currentParagraph = []
+        } else {
+          processedLines.push(line)
+        }
+      }
+    }
+
+    // Add any remaining paragraph
+    if (currentParagraph.length > 0) {
+      processedLines.push(currentParagraph.join(' '))
+    }
+
+    return processedLines
+  }
+
   return (
     <motion.div
       variants={container}
@@ -72,10 +108,41 @@ const SimplifiedAnimatedCodeBlock = ({ code }) => {
         }}
       >
         <pre className="p-4 overflow-x-auto">
-          {code.split('\n').map((line, lineIndex) => {
-            // Split the line into parts to apply different colors
-            const parts = line.split(/(\s+)/)
+          {processText(code).map((line, lineIndex) => {
+            // Check if the line contains a comment
+            const commentIndex = line.indexOf('#')
+            if (commentIndex !== -1) {
+              // Split the line into code and comment parts
+              const codePart = line.substring(0, commentIndex)
+              const commentPart = line.substring(commentIndex)
+              
+              return (
+                <div key={lineIndex} className="min-w-0 flex flex-wrap">
+                  {/* Render code part if it exists */}
+                  {codePart && codePart.split(/(\s+)/).map((part, partIndex) => (
+                    <span
+                      key={`code-${partIndex}`}
+                      style={{
+                        color: getHighlightColor(part)
+                      }}
+                    >
+                      {part}
+                    </span>
+                  ))}
+                  {/* Render comment part in green */}
+                  <span
+                    style={{
+                      color: '#6a9955' // Green for comments
+                    }}
+                  >
+                    {commentPart}
+                  </span>
+                </div>
+              )
+            }
             
+            // If no comment, process line normally
+            const parts = line.split(/(\s+)/)
             return (
               <div
                 key={lineIndex}
