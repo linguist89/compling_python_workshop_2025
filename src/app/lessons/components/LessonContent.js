@@ -2,13 +2,16 @@
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { ProgressContext } from '@/app/contexts/ProgressContext';
+import { useTheme } from '@/app/contexts/ThemeContext';
 import LaptopPopup from '@/app/components/LaptopPopup';
 
 export default function LessonContent({ content, lessonId }) {
   const { markSectionComplete, setTotalSections, progress, getProgress } = useContext(ProgressContext);
+  const { currentTheme } = useTheme();
   const [expandedSections, setExpandedSections] = useState({});
   const [showLaptopPopup, setShowLaptopPopup] = useState(false);
   
@@ -75,7 +78,7 @@ export default function LessonContent({ content, lessonId }) {
     <>
       <div className="space-y-8">
         {/* Main Content */}
-        <div className="prose prose-invert max-w-none">
+        <div className="prose prose-invert max-w-none" style={{ color: 'var(--text-primary)' }}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -89,7 +92,8 @@ export default function LessonContent({ content, lessonId }) {
                     <code 
                       className={className}
                       style={{
-                        backgroundColor: '#2d2d2d',
+                        backgroundColor: 'var(--card-background)',
+                        color: 'var(--text-primary)',
                         padding: '0.2em 0.4em',
                         borderRadius: '0.2em',
                         fontSize: '0.9em'
@@ -105,12 +109,13 @@ export default function LessonContent({ content, lessonId }) {
                   <div className="relative rounded-lg overflow-hidden my-4">
                     <SyntaxHighlighter
                       language={language}
-                      style={vscDarkPlus}
+                      style={currentTheme?.isDark ? vscDarkPlus : oneLight}
                       customStyle={{
                         margin: 0,
                         borderRadius: '0.5rem',
                         fontSize: '0.9em',
-                        lineHeight: '1.5'
+                        lineHeight: '1.5',
+                        backgroundColor: 'var(--card-background)'
                       }}
                       showLineNumbers={true}
                       wrapLines={true}
@@ -120,7 +125,15 @@ export default function LessonContent({ content, lessonId }) {
                     </SyntaxHighlighter>
                   </div>
                 );
-              }
+              },
+              h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)' }}>{children}</h1>,
+              h2: ({ children }) => <h2 style={{ color: 'var(--text-accent)' }}>{children}</h2>,
+              h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)' }}>{children}</h3>,
+              h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)' }}>{children}</h4>,
+              p: ({ children }) => <p style={{ color: 'var(--text-primary)' }}>{children}</p>,
+              li: ({ children }) => <li style={{ color: 'var(--text-primary)' }}>{children}</li>,
+              strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
+              em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>
             }}
           >
             {mainContent}
@@ -138,17 +151,19 @@ export default function LessonContent({ content, lessonId }) {
               className="rounded-lg overflow-hidden border border-gray-700"
               style={{
                 backgroundColor: 'var(--card-background)',
+                borderColor: 'var(--card-border)'
               }}
             >
               {/* Section Title */}
               <button 
                 onClick={() => toggleSection(index)}
-                className="w-full border-b border-gray-700 p-4 flex items-center justify-between cursor-pointer hover:bg-opacity-50 transition-colors"
+                className="w-full border-b p-4 flex items-center justify-between cursor-pointer hover:bg-opacity-50 transition-colors"
                 style={{
-                  backgroundColor: 'var(--card-background-light)',
+                  backgroundColor: 'var(--card-background)',
+                  borderColor: 'var(--card-border)'
                 }}
               >
-                <h2 className="text-2xl font-semibold m-0">{section.title}</h2>
+                <h2 className="text-2xl font-semibold m-0" style={{ color: 'var(--text-accent)' }}>{section.title}</h2>
                 <div className="flex items-center gap-4">
                   {/* Completion Indicator */}
                   {isCompleted && (
@@ -192,11 +207,10 @@ export default function LessonContent({ content, lessonId }) {
                 }`}
               >
                 <div className="p-6">
-                  <div className="prose prose-invert max-w-none">
+                  <div className="prose prose-invert max-w-none" style={{ color: 'var(--text-primary)' }}>
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
-                        h2: () => null,
                         code({ node, inline, className, children, ...props }) {
                           const match = /language-(\w+)/.exec(className || '');
                           const language = match ? match[1] : 'text';
@@ -207,7 +221,8 @@ export default function LessonContent({ content, lessonId }) {
                               <code 
                                 className={className}
                                 style={{
-                                  backgroundColor: '#2d2d2d',
+                                  backgroundColor: 'var(--card-background)',
+                                  color: 'var(--text-primary)',
                                   padding: '0.2em 0.4em',
                                   borderRadius: '0.2em',
                                   fontSize: '0.9em'
@@ -223,12 +238,13 @@ export default function LessonContent({ content, lessonId }) {
                             <div className="relative rounded-lg overflow-hidden my-4">
                               <SyntaxHighlighter
                                 language={language}
-                                style={vscDarkPlus}
+                                style={currentTheme?.isDark ? vscDarkPlus : oneLight}
                                 customStyle={{
                                   margin: 0,
                                   borderRadius: '0.5rem',
                                   fontSize: '0.9em',
-                                  lineHeight: '1.5'
+                                  lineHeight: '1.5',
+                                  backgroundColor: 'var(--card-background)'
                                 }}
                                 showLineNumbers={true}
                                 wrapLines={true}
@@ -238,7 +254,15 @@ export default function LessonContent({ content, lessonId }) {
                               </SyntaxHighlighter>
                             </div>
                           );
-                        }
+                        },
+                        h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)' }}>{children}</h1>,
+                        h2: ({ children }) => <h2 style={{ color: 'var(--text-accent)' }}>{children}</h2>,
+                        h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)' }}>{children}</h3>,
+                        h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)' }}>{children}</h4>,
+                        p: ({ children }) => <p style={{ color: 'var(--text-primary)' }}>{children}</p>,
+                        li: ({ children }) => <li style={{ color: 'var(--text-primary)' }}>{children}</li>,
+                        strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
+                        em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>
                       }}
                     >
                       {section.content}

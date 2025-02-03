@@ -27,24 +27,54 @@ export default {
             },
             code: {
               fontFamily: 'Fira Code, Courier New, monospace',
-              backgroundColor: '#F5F5F5',
+              backgroundColor: 'var(--card-background)',
+              color: 'var(--text-primary)',
               padding: '0.2em 0.4em',
               borderRadius: '0.25rem',
               fontSize: '0.875em',
             },
             pre: {
-              backgroundColor: '#1E293B',
-              color: '#4A90E2',
-              padding: '0 0.5rem 0 0.5rem',
+              backgroundColor: 'var(--card-background)',
+              color: 'var(--text-primary)',
+              padding: '1rem',
               borderRadius: '0.5rem',
               overflowX: 'auto',
-              fontSize: '1em',
+              border: '1px solid var(--card-border)',
             },
             'pre code': {
               backgroundColor: 'transparent',
               padding: 0,
               color: 'inherit',
               fontSize: '1em',
+              border: 'none',
+            },
+            color: 'var(--text-primary)',
+            h1: {
+              color: 'var(--text-primary)',
+            },
+            h2: {
+              color: 'var(--text-accent)',
+            },
+            h3: {
+              color: 'var(--text-accent)',
+            },
+            h4: {
+              color: 'var(--text-accent)',
+            },
+            p: {
+              color: 'var(--text-primary)',
+            },
+            strong: {
+              color: 'var(--text-accent)',
+            },
+            a: {
+              color: 'var(--text-accent)',
+              '&:hover': {
+                color: 'var(--interactive-hover)',
+              },
+            },
+            li: {
+              color: 'var(--text-primary)',
             },
           },
         },
