@@ -18,6 +18,7 @@ export default function WelcomePopup() {
   const [showFlagRain, setShowFlagRain] = useState(false)
   const [mode, setMode] = useState('choice') // 'choice', 'register', or 'login'
   const [error, setError] = useState('')
+  const [userType, setUserType] = useState('student')
 
   useEffect(() => {
     const savedData = localStorage.getItem('userDataPythonWorkshop')
@@ -61,7 +62,7 @@ export default function WelcomePopup() {
           encryptedPassword: encryptPassword(password),
           userCountry: selectedCountry,
           fontSize: 16,
-          user_type: 'student'
+          user_type: userType
         }
 
         // Save to Firestore
@@ -72,7 +73,7 @@ export default function WelcomePopup() {
           userName: name.trim(),
           fontSize: 16,
           userCountry: selectedCountry,
-          user_type: 'student'
+          user_type: userType
         }
         localStorage.setItem('userDataPythonWorkshop', JSON.stringify(localData))
         
@@ -231,18 +232,43 @@ export default function WelcomePopup() {
             </div>
 
             {mode === 'register' && (
-              <div>
-                <label 
-                  className="block mb-2 font-medium"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  Your Country
-                </label>
-                <CountrySelector
-                  selectedCountry={selectedCountry}
-                  onSelect={setSelectedCountry}
-                />
-              </div>
+              <>
+                <div>
+                  <label 
+                    className="block mb-2 font-medium"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    Your Country
+                  </label>
+                  <CountrySelector
+                    selectedCountry={selectedCountry}
+                    onSelect={setSelectedCountry}
+                  />
+                </div>
+
+                <div>
+                  <label 
+                    className="block mb-2 font-medium"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    User Type
+                  </label>
+                  <select
+                    value={userType}
+                    onChange={(e) => setUserType(e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg"
+                    style={{
+                      backgroundColor: 'var(--card-background)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--card-border)'
+                    }}
+                    required
+                  >
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                  </select>
+                </div>
+              </>
             )}
 
             {error && (
