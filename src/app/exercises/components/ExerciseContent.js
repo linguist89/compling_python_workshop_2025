@@ -199,7 +199,49 @@ export default function ExerciseContent({ content }) {
                 </p>
               );
             },
-            li: ({ children }) => <li style={{ color: 'var(--text-primary)' }}>{children}</li>,
+            li: ({ children, ordered, index, node }) => {
+              // Calculate nesting level by counting parent <ul> or <ol> elements
+              let level = 0;
+              let parent = node.parent;
+              while (parent) {
+                if (parent.type === 'list') level++;
+                parent = parent.parent;
+              }
+
+              return (
+                <li 
+                  className="relative"
+                  style={{ 
+                    color: 'var(--text-primary)',
+                    marginLeft: `${level * 1.5}rem`,
+                    paddingLeft: '1.5rem',
+                    listStyleType: 'none',
+                    position: 'relative'
+                  }}
+                >
+                  <span 
+                    className="absolute left-0 top-[0.6em] transform -translate-y-1/2"
+                    style={{
+                      color: 'var(--text-accent)',
+                      opacity: 0.8
+                    }}
+                  >
+                    {ordered ? `${index + 1}.` : '•'}
+                  </span>
+                  {children}
+                </li>
+              );
+            },
+            ul: ({ children }) => (
+              <ul className="space-y-2 my-4">
+                {children}
+              </ul>
+            ),
+            ol: ({ children }) => (
+              <ol className="space-y-2 my-4">
+                {children}
+              </ol>
+            ),
             strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
             em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>
           }}
@@ -368,7 +410,49 @@ export default function ExerciseContent({ content }) {
                           </p>
                         );
                       },
-                      li: ({ children }) => <li style={{ color: 'var(--text-primary)' }}>{children}</li>,
+                      li: ({ children, ordered, index, node }) => {
+                        // Calculate nesting level by counting parent <ul> or <ol> elements
+                        let level = 0;
+                        let parent = node.parent;
+                        while (parent) {
+                          if (parent.type === 'list') level++;
+                          parent = parent.parent;
+                        }
+
+                        return (
+                          <li 
+                            className="relative"
+                            style={{ 
+                              color: 'var(--text-primary)',
+                              marginLeft: `${level * 1.5}rem`,
+                              paddingLeft: '1.5rem',
+                              listStyleType: 'none',
+                              position: 'relative'
+                            }}
+                          >
+                            <span 
+                              className="absolute left-0 top-[0.6em] transform -translate-y-1/2"
+                              style={{
+                                color: 'var(--text-accent)',
+                                opacity: 0.8
+                              }}
+                            >
+                              {ordered ? `${index + 1}.` : '•'}
+                            </span>
+                            {children}
+                          </li>
+                        );
+                      },
+                      ul: ({ children }) => (
+                        <ul className="space-y-2 my-4">
+                          {children}
+                        </ul>
+                      ),
+                      ol: ({ children }) => (
+                        <ol className="space-y-2 my-4">
+                          {children}
+                        </ol>
+                      ),
                       strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
                       em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>
                     }}
