@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { verifyUserIsTeacher } from '@/lib/auth'
 import { db } from '@/lib/firebase'
-import { collection, getDocs } from 'firebase/firestore'
+import { collection, getDocs, addDoc, query, orderBy, limit } from 'firebase/firestore'
 import { toast } from 'react-hot-toast'
 
 const FUNNY_GROUP_NAMES = [
@@ -96,6 +96,7 @@ export default function ClassGroupsPage() {
   const [allStudents, setAllStudents] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [isTeacher, setIsTeacher] = useState(false)
+  const [savedGroups, setSavedGroups] = useState([])
   const router = useRouter()
 
   useEffect(() => {
@@ -146,6 +147,29 @@ export default function ClassGroupsPage() {
 
     if (isTeacher) {
       loadStudents()
+    }
+  }, [isTeacher])
+
+  // Load saved groups
+  useEffect(() => {
+    const loadSavedGroups = async () => {
+      try {
+        const savedGroupsRef = collection(db, 'savedGroups')
+        const q = query(savedGroupsRef, orderBy('timestamp', 'desc'), limit(5))
+        const snapshot = await getDocs(q)
+        const groups = []
+        snapshot.forEach(doc => {
+          groups.push({ id: doc.id, ...doc.data() })
+        })
+        setSavedGroups(groups)
+      } catch (error) {
+        console.error('Error loading saved groups:', error)
+        toast.error('Failed to load saved groups')
+      }
+    }
+
+    if (isTeacher) {
+      loadSavedGroups()
     }
   }, [isTeacher])
 
@@ -202,6 +226,57 @@ export default function ClassGroupsPage() {
     return groups.some(group => group.members.some(student => student.id === studentId))
   }
 
+  const saveCurrentGroups = async () => {
+    try {
+      if (groups.length === 0) {
+        toast.error('No groups to save')
+        return
+      }
+
+      const timestamp = new Date()
+      const savedGroupData = {
+        groups,
+        timestamp,
+        groupSize
+      }
+
+      await addDoc(collection(db, 'savedGroups'), savedGroupData)
+      
+      // Refresh saved groups
+      const savedGroupsRef = collection(db, 'savedGroups')
+      const q = query(savedGroupsRef, orderBy('timestamp', 'desc'), limit(5))
+      const snapshot = await getDocs(q)
+      const updatedGroups = []
+      snapshot.forEach(doc => {
+        updatedGroups.push({ id: doc.id, ...doc.data() })
+      })
+      setSavedGroups(updatedGroups)
+      
+      toast.success('Groups saved successfully')
+    } catch (error) {
+      console.error('Error saving groups:', error)
+      toast.error('Failed to save groups')
+    }
+  }
+
+  const formatDate = (timestamp) => {
+    const date = timestamp.toDate()
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    })
+  }
+
+  const loadSavedGroup = (savedGroup) => {
+    setGroups(savedGroup.groups)
+    setGroupSize(savedGroup.groupSize)
+    toast.success('Groups loaded successfully')
+  }
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -227,6 +302,78 @@ export default function ClassGroupsPage() {
         Class Groups
       </h1>
 
+      {/* Saved Groups Panel - Now at the top */}
+      <div 
+        className="mb-8 p-4 rounded-lg"
+        style={{
+          backgroundColor: 'var(--card-background)',
+          borderColor: 'var(--card-border)',
+          border: '1px solid'
+        }}
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h2 
+            className="text-lg font-semibold"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Saved Groups
+          </h2>
+          {groups.length > 0 && (
+            <button
+              onClick={saveCurrentGroups}
+              className="text-sm px-3 py-1 rounded"
+              style={{
+                backgroundColor: 'var(--text-accent)',
+                color: 'var(--color-dark)'
+              }}
+            >
+              Save Current
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {savedGroups.map((saved) => (
+            <div
+              key={saved.id}
+              className="text-sm p-3 rounded cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+              style={{
+                backgroundColor: 'var(--card-background-secondary)',
+                border: '1px solid var(--card-border)'
+              }}
+              onClick={() => loadSavedGroup(saved)}
+            >
+              <div style={{ color: 'var(--text-secondary)' }}>
+                {formatDate(saved.timestamp)}
+              </div>
+              <div 
+                className="mt-1 flex justify-between items-center"
+              >
+                <span style={{ color: 'var(--text-primary)' }}>
+                  {saved.groups.length} groups, {saved.groupSize} students per group
+                </span>
+                <button
+                  className="text-xs px-2 py-1 rounded opacity-0 hover:opacity-100 transition-opacity duration-200"
+                  style={{
+                    backgroundColor: 'var(--text-accent)',
+                    color: 'var(--color-dark)'
+                  }}
+                >
+                  Load
+                </button>
+              </div>
+            </div>
+          ))}
+          {savedGroups.length === 0 && (
+            <div 
+              className="text-sm col-span-full text-center py-4"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              No saved groups yet
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Left side: Controls and Student List */}
         <div className="lg:col-span-1">
@@ -242,8 +389,11 @@ export default function ClassGroupsPage() {
                 type="number"
                 min="2"
                 max="10"
-                value={groupSize}
-                onChange={(e) => setGroupSize(parseInt(e.target.value))}
+                value={groupSize || ''}
+                onChange={(e) => {
+                  const value = e.target.value === '' ? '' : parseInt(e.target.value)
+                  setGroupSize(value === '' ? 3 : value)
+                }}
                 className="w-24 px-3 py-2 rounded-md"
                 style={{
                   backgroundColor: 'var(--input-background)',
@@ -268,6 +418,7 @@ export default function ClassGroupsPage() {
             </div>
           </div>
 
+          {/* Student List */}
           <div 
             className="p-4 rounded-lg"
             style={{

@@ -6,6 +6,10 @@ service cloud.firestore {
       allow read, write: if true;  // This allows anyone to read and write to the users collection
     }
     
+    match /savedGroups/{groupId} {
+      allow read, write: if true;  // Allow access to savedGroups collection
+    }
+    
     match /{document=**} {
       allow read, write: if false;  // This denies access to all other collections
     }

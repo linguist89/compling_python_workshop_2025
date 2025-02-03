@@ -7,15 +7,25 @@ export default function GenerateTestDataPopup({ isOpen, onClose }) {
   const [count, setCount] = useState(10);
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
+
+    if (!password.trim()) {
+      setError('No password');
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const isTeacher = await verifyUserIsTeacher(password);
       if (!isTeacher) {
-        throw new Error('Unauthorized - Invalid password or not a teacher account');
+        setError("Password doesn't match");
+        setIsLoading(false);
+        return;
       }
 
       const generatedCount = await generateTestStudents(count);
@@ -23,7 +33,7 @@ export default function GenerateTestDataPopup({ isOpen, onClose }) {
       onClose();
     } catch (error) {
       console.error('Error in handleSubmit:', error);
-      toast.error(error.message);
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -58,19 +68,29 @@ export default function GenerateTestDataPopup({ isOpen, onClose }) {
             >
               Teacher Password:
             </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="block w-full px-3 py-2 rounded-md transition-colors duration-200 mb-4"
-              style={{
-                backgroundColor: 'var(--input-background)',
-                color: 'var(--text-primary)',
-                borderColor: 'var(--card-border)',
-                border: '1px solid',
-              }}
-              placeholder="Enter password"
-            />
+            <div className="relative">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError(''); // Clear error when user types
+                }}
+                className="block w-full px-3 py-2 rounded-md transition-colors duration-200 mb-1"
+                style={{
+                  backgroundColor: 'var(--input-background)',
+                  color: 'var(--text-primary)',
+                  borderColor: error ? '#ef4444' : 'var(--card-border)',
+                  border: '1px solid',
+                }}
+                placeholder="Enter password"
+              />
+              {error && (
+                <div className="text-sm text-red-500 mb-3">
+                  {error}
+                </div>
+              )}
+            </div>
             <label 
               className="block text-sm font-medium mb-2"
               style={{ color: 'var(--text-primary)' }}
@@ -81,8 +101,11 @@ export default function GenerateTestDataPopup({ isOpen, onClose }) {
               type="number"
               min="1"
               max="100"
-              value={count}
-              onChange={(e) => setCount(parseInt(e.target.value))}
+              value={count || ''}
+              onChange={(e) => {
+                const value = e.target.value === '' ? '' : parseInt(e.target.value)
+                setCount(value === '' ? 10 : value)
+              }}
               className="block w-full px-3 py-2 rounded-md transition-colors duration-200"
               style={{
                 backgroundColor: 'var(--input-background)',
