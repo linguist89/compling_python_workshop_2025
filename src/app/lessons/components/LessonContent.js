@@ -145,7 +145,7 @@ export default function LessonContent({ content, lessonId }) {
                   <div className="relative">
                     <button
                       onClick={() => handleCopyClick(codeContent, `${language}-${codeContent.slice(0, 20)}`)}
-                      className="absolute right-2 top-2 p-2 rounded-lg transition-all duration-200 hover:bg-opacity-80 flex items-center gap-2"
+                      className="absolute right-2 top-2 p-1 rounded-md transition-all duration-200 hover:bg-opacity-80 flex items-center gap-2"
                       style={{ 
                         backgroundColor: 'var(--interactive-hover)',
                         color: 'var(--text-inverse)',
@@ -156,7 +156,7 @@ export default function LessonContent({ content, lessonId }) {
                       {copiedStates[`${language}-${codeContent.slice(0, 20)}`] ? (
                         <svg 
                           xmlns="http://www.w3.org/2000/svg" 
-                          className="h-4 w-4" 
+                          className="h-3 w-3" 
                           viewBox="0 0 20 20" 
                           fill="currentColor"
                         >
@@ -205,10 +205,24 @@ export default function LessonContent({ content, lessonId }) {
                   </div>
                 );
               },
-              h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)' }}>{children}</h1>,
-              h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)' }}>{children}</h3>,
-              h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)' }}>{children}</h4>,
-              p: ({ children }) => <p style={{ color: 'var(--text-primary)', marginTop: '2rem' }}>{children}</p>,
+              h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)', marginTop: '2rem' }}>{children}</h1>,
+              h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)', marginTop: '2rem' }}>{children}</h3>,
+              h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)', marginTop: '2rem' }}>{children}</h4>,
+              p: ({ children, node }) => {
+                // Check if the previous element is a heading
+                const prevElement = node.prev;
+                const isAfterHeading = prevElement && ['h1', 'h2', 'h3', 'h4'].includes(prevElement.tagName);
+                const isAfterCode = prevElement && prevElement.tagName === 'code';
+                
+                return (
+                  <p style={{ 
+                    color: 'var(--text-primary)', 
+                    marginTop: isAfterHeading ? '0.75rem' : isAfterCode ? '2rem' : '1.5rem'
+                  }}>
+                    {children}
+                  </p>
+                );
+              },
               li: ({ children }) => <li style={{ color: 'var(--text-primary)' }}>{children}</li>,
               strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
               em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>
@@ -318,7 +332,7 @@ export default function LessonContent({ content, lessonId }) {
                             <div className="relative">
                               <button
                                 onClick={() => handleCopyClick(codeContent, `${language}-${codeContent.slice(0, 20)}`)}
-                                className="absolute right-2 top-2 p-2 rounded-lg transition-all duration-200 hover:bg-opacity-80 flex items-center gap-2"
+                                className="absolute right-2 top-2 p-1 rounded-md transition-all duration-200 hover:bg-opacity-80 flex items-center gap-2"
                                 style={{ 
                                   backgroundColor: 'var(--interactive-hover)',
                                   color: 'var(--text-inverse)',
@@ -329,7 +343,7 @@ export default function LessonContent({ content, lessonId }) {
                                 {copiedStates[`${language}-${codeContent.slice(0, 20)}`] ? (
                                   <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
-                                    className="h-4 w-4" 
+                                    className="h-3 w-3" 
                                     viewBox="0 0 20 20" 
                                     fill="currentColor"
                                   >
@@ -378,10 +392,24 @@ export default function LessonContent({ content, lessonId }) {
                             </div>
                           );
                         },
-                        h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)' }}>{children}</h1>,
-                        h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)' }}>{children}</h3>,
-                        h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)' }}>{children}</h4>,
-                        p: ({ children }) => <p style={{ color: 'var(--text-primary)', marginTop: '2rem' }}>{children}</p>,
+                        h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)', marginTop: '2rem' }}>{children}</h1>,
+                        h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)', marginTop: '2rem' }}>{children}</h3>,
+                        h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)', marginTop: '2rem' }}>{children}</h4>,
+                        p: ({ children, node }) => {
+                          // Check if the previous element is a heading
+                          const prevElement = node.prev;
+                          const isAfterHeading = prevElement && ['h1', 'h2', 'h3', 'h4'].includes(prevElement.tagName);
+                          const isAfterCode = prevElement && prevElement.tagName === 'code';
+                          
+                          return (
+                            <p style={{ 
+                              color: 'var(--text-primary)', 
+                              marginTop: isAfterHeading ? '0.75rem' : isAfterCode ? '2rem' : '1.5rem'
+                            }}>
+                              {children}
+                            </p>
+                          );
+                        },
                         li: ({ children }) => <li style={{ color: 'var(--text-primary)' }}>{children}</li>,
                         strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
                         em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>
