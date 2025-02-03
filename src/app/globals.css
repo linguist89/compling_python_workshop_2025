@@ -44,8 +44,16 @@
   --interactive-focus: #3B82F6;
   --interactive-disabled: #94A3B8;
   --card-background: #FFFFFF;
+  --card-background-light: #F8FAFC;
   --card-border: #E2E8F0;
   --card-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  /* Syntax highlighting for light mode */
+  --syntax-comment: #6B7280;
+  --syntax-string: #059669;
+  --syntax-number: #0E7490;
+  --syntax-keyword: #4F46E5;
+  --syntax-function: #0369A1;
+  --syntax-operator: #9333EA;
   --gradient-background: linear-gradient(135deg, #F8FAFC, #EFF6FF);
   --gradient-card: linear-gradient(135deg, #FFFFFF, #F8FAFC);
   --gradient-hover: linear-gradient(135deg, #2563EB, #1D4ED8);
@@ -68,8 +76,16 @@
   --interactive-focus: #FFC107;
   --interactive-disabled: #4D5B5B;
   --card-background: #0D1B2A;
+  --card-background-light: #0F172A;
   --card-border: #00E6E620;
   --card-shadow: 0 4px 20px rgba(0, 230, 230, 0.1);
+  /* Syntax highlighting for dark mode */
+  --syntax-comment: #8CA2A2;
+  --syntax-string: #00E6E6;
+  --syntax-number: #FFC107;
+  --syntax-keyword: #00FFFF;
+  --syntax-function: #00E6E6;
+  --syntax-operator: #FFC107;
   --gradient-background: linear-gradient(to right, #0A192F, #050B18);
   --gradient-card: linear-gradient(to right, #0D1B2A, #0A192F);
   --gradient-hover: linear-gradient(to right, #00E6E6, #00FFFF);

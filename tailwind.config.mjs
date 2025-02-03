@@ -27,19 +27,20 @@ export default {
             },
             code: {
               fontFamily: 'Fira Code, Courier New, monospace',
-              backgroundColor: 'var(--card-background)',
+              backgroundColor: 'var(--card-background-light)',
               color: 'var(--text-primary)',
               padding: '0.2em 0.4em',
               borderRadius: '0.25rem',
               fontSize: '0.875em',
             },
             pre: {
-              backgroundColor: 'var(--card-background)',
+              backgroundColor: 'var(--card-background-light)',
               color: 'var(--text-primary)',
-              padding: '1rem',
+              padding: '1.5rem',
               borderRadius: '0.5rem',
               overflowX: 'auto',
               border: '1px solid var(--card-border)',
+              boxShadow: 'var(--card-shadow)',
             },
             'pre code': {
               backgroundColor: 'transparent',
@@ -47,6 +48,26 @@ export default {
               color: 'inherit',
               fontSize: '1em',
               border: 'none',
+              lineHeight: 1.75,
+            },
+            // Syntax highlighting colors for light mode
+            '.token.comment': {
+              color: 'var(--syntax-comment)',
+            },
+            '.token.string': {
+              color: 'var(--syntax-string)',
+            },
+            '.token.number': {
+              color: 'var(--syntax-number)',
+            },
+            '.token.keyword': {
+              color: 'var(--syntax-keyword)',
+            },
+            '.token.function': {
+              color: 'var(--syntax-function)',
+            },
+            '.token.operator': {
+              color: 'var(--syntax-operator)',
             },
             color: 'var(--text-primary)',
             h1: {

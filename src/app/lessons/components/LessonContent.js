@@ -82,6 +82,7 @@ export default function LessonContent({ content, lessonId }) {
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
+              h2: () => null,
               code({ node, inline, className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '');
                 const language = match ? match[1] : 'text';
@@ -127,7 +128,6 @@ export default function LessonContent({ content, lessonId }) {
                 );
               },
               h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)' }}>{children}</h1>,
-              h2: ({ children }) => <h2 style={{ color: 'var(--text-accent)' }}>{children}</h2>,
               h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)' }}>{children}</h3>,
               h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)' }}>{children}</h4>,
               p: ({ children }) => <p style={{ color: 'var(--text-primary)' }}>{children}</p>,
@@ -211,6 +211,7 @@ export default function LessonContent({ content, lessonId }) {
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
+                        h2: () => null,
                         code({ node, inline, className, children, ...props }) {
                           const match = /language-(\w+)/.exec(className || '');
                           const language = match ? match[1] : 'text';
@@ -256,7 +257,6 @@ export default function LessonContent({ content, lessonId }) {
                           );
                         },
                         h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)' }}>{children}</h1>,
-                        h2: ({ children }) => <h2 style={{ color: 'var(--text-accent)' }}>{children}</h2>,
                         h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)' }}>{children}</h3>,
                         h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)' }}>{children}</h4>,
                         p: ({ children }) => <p style={{ color: 'var(--text-primary)' }}>{children}</p>,
