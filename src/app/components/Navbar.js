@@ -5,13 +5,22 @@ import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import Laptop from './Laptop'
 import { useProgress } from '../contexts/ProgressContext'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const pathname = usePathname()
   const { getProgress } = useProgress()
   const progress = getProgress()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [quizDone, setQuizDone] = useState(false)
+
+  useEffect(() => {
+    const savedData = localStorage.getItem('userDataPythonWorkshop')
+    if (savedData) {
+      const parsedData = JSON.parse(savedData)
+      setQuizDone(parsedData.quizDone || false)
+    }
+  }, [pathname]) // Re-check when pathname changes
 
   return (
     <nav 
@@ -93,6 +102,18 @@ export default function Navbar() {
             >
               Exercises
             </Link>
+            {!quizDone && (
+              <Link
+                href="/quiz"
+                className="transition-colors duration-300"
+                style={{
+                  color: pathname === '/quiz' ? 'var(--text-accent)' : 'var(--text-primary)',
+                  borderBottom: pathname === '/quiz' ? '2px solid var(--text-accent)' : 'none'
+                }}
+              >
+                Quiz
+              </Link>
+            )}
             <Link
               href="/personalize"
               className="transition-colors duration-300"
@@ -155,6 +176,19 @@ export default function Navbar() {
             >
               Exercises
             </Link>
+            {!quizDone && (
+              <Link
+                href="/quiz"
+                className="block px-4 py-2 transition-colors duration-300"
+                style={{
+                  color: pathname === '/quiz' ? 'var(--text-accent)' : 'var(--text-primary)',
+                  backgroundColor: pathname === '/quiz' ? 'var(--color-hover)' : 'transparent'
+                }}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Quiz
+              </Link>
+            )}
             <Link
               href="/personalize"
               className="block px-4 py-2 transition-colors duration-300"

@@ -1,5 +1,7 @@
 'use client'
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { db } from '@/lib/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
 
 export const ProgressContext = createContext();
 
@@ -17,19 +19,22 @@ const initialProgressState = {
 
 export function ProgressProvider({ children }) {
   const [progress, setProgress] = useState(initialProgressState);
+  const [userName, setUserName] = useState('');
   const completionCallbackRef = useRef(null);
 
   useEffect(() => {
-    // Load progress from localStorage on mount
-    const savedProgress = localStorage.getItem('progress');
-    if (savedProgress) {
+    // Load progress from userDataPythonWorkshop on mount
+    const savedData = localStorage.getItem('userDataPythonWorkshop');
+    if (savedData) {
       try {
-        const parsed = JSON.parse(savedProgress);
-        // Ensure the parsed data has the correct structure
-        if (parsed && parsed.lessons) {
+        const parsedData = JSON.parse(savedData);
+        if (parsedData.userName) {
+          setUserName(parsedData.userName);
+        }
+        if (parsedData.progress) {
           setProgress(prev => ({
-            ...parsed,
-            hasReachedCompletion: parsed.hasReachedCompletion || false
+            ...parsedData.progress,
+            hasReachedCompletion: parsedData.progress.hasReachedCompletion || false
           }));
         } else {
           setProgress(initialProgressState);
@@ -40,6 +45,28 @@ export function ProgressProvider({ children }) {
       }
     }
   }, []);
+
+  const saveProgress = useCallback(async (newProgress) => {
+    if (!userName) return;
+
+    try {
+      // Save to localStorage
+      const savedData = localStorage.getItem('userDataPythonWorkshop');
+      const parsedData = savedData ? JSON.parse(savedData) : {};
+      localStorage.setItem('userDataPythonWorkshop', JSON.stringify({
+        ...parsedData,
+        progress: newProgress
+      }));
+
+      // Save to Firestore
+      const userDoc = doc(db, 'users', userName);
+      await updateDoc(userDoc, {
+        progress: newProgress
+      });
+    } catch (error) {
+      console.error('Error saving progress:', error);
+    }
+  }, [userName]);
 
   const markSectionComplete = useCallback((lessonId) => {
     if (!lessonId) return;
@@ -81,12 +108,11 @@ export function ProgressProvider({ children }) {
         }
       }
 
-      localStorage.setItem('progress', JSON.stringify(newProgress));
+      saveProgress(newProgress);
       return newProgress;
     });
-  }, []);
+  }, [saveProgress]);
 
-  // Update setProgress to handle completion checks
   const updateProgress = useCallback((newState) => {
     setProgress(prev => {
       const updatedProgress = typeof newState === 'function' ? newState(prev) : newState;
@@ -113,10 +139,10 @@ export function ProgressProvider({ children }) {
         }
       }
 
-      localStorage.setItem('progress', JSON.stringify(updatedProgress));
+      saveProgress(updatedProgress);
       return updatedProgress;
     });
-  }, []);
+  }, [saveProgress]);
 
   const setTotalSections = useCallback((lessonId, total) => {
     if (!lessonId) return;
@@ -132,10 +158,10 @@ export function ProgressProvider({ children }) {
           }
         }
       };
-      localStorage.setItem('progress', JSON.stringify(newProgress));
+      saveProgress(newProgress);
       return newProgress;
     });
-  }, []);
+  }, [saveProgress]);
 
   const getProgress = useCallback(() => {
     // Calculate overall percentage based on all lessons contributing equally
@@ -162,12 +188,13 @@ export function ProgressProvider({ children }) {
   }, [progress]);
 
   const resetProgress = useCallback(() => {
-    setProgress({
+    const newProgress = {
       ...initialProgressState,
       hasReachedCompletion: false
-    });
-    localStorage.removeItem('progress');
-  }, []);
+    };
+    setProgress(newProgress);
+    saveProgress(newProgress);
+  }, [saveProgress]);
 
   const registerCompletionCallback = useCallback((callback) => {
     completionCallbackRef.current = callback;
