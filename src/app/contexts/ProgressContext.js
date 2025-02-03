@@ -1,7 +1,7 @@
 'use client'
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 
-const ProgressContext = createContext();
+export const ProgressContext = createContext();
 
 const TOTAL_LESSONS = 3; // Total number of lessons in the course
 const LESSON_WEIGHT = 100 / TOTAL_LESSONS; // Each lesson is worth 33.33% of total progress

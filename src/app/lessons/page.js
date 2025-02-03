@@ -71,7 +71,10 @@ export default function LessonsPage() {
                   <div className="h-4 bg-gray-200 rounded w-5/6"></div>
                 </div>
               ) : (
-                <LessonContent content={lessonContent} />
+                <LessonContent 
+                  content={lessonContent}
+                  lessonId={selectedLesson}
+                />
               )}
             </div>
           </div>
