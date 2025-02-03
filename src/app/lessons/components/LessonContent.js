@@ -14,6 +14,7 @@ export default function LessonContent({ content, lessonId }) {
   const { currentTheme } = useTheme();
   const [expandedSections, setExpandedSections] = useState({});
   const [showLaptopPopup, setShowLaptopPopup] = useState(false);
+  const [copiedStates, setCopiedStates] = useState({});
   
   // Split content into main content and sections
   const { mainContent, sections } = useMemo(() => {
@@ -74,6 +75,39 @@ export default function LessonContent({ content, lessonId }) {
     }));
   };
 
+  const cleanCodeIndentation = (code) => {
+    // Split into lines and get non-empty lines
+    const lines = code.split('\n');
+    const nonEmptyLines = lines.filter(line => line.trim().length > 0);
+
+    // Find the minimum indentation level
+    const minIndent = Math.min(
+      ...nonEmptyLines.map(line => {
+        const match = line.match(/^\s*/);
+        return match ? match[0].length : 0;
+      })
+    );
+
+    // Remove the common indentation from all lines while preserving relative indentation
+    return lines
+      .map(line => {
+        if (line.trim().length === 0) return '';
+        return line.slice(minIndent);
+      })
+      .join('\n')
+      .trim();
+  };
+
+  const handleCopyClick = (code, index) => {
+    const cleanCode = cleanCodeIndentation(code);
+    navigator.clipboard.writeText(cleanCode).then(() => {
+      setCopiedStates(prev => ({ ...prev, [index]: true }));
+      setTimeout(() => {
+        setCopiedStates(prev => ({ ...prev, [index]: false }));
+      }, 2000);
+    });
+  };
+
   return (
     <>
       <div className="space-y-8">
@@ -108,25 +142,67 @@ export default function LessonContent({ content, lessonId }) {
                 }
 
                 return (
-                  <SyntaxHighlighter
-                    language={language}
-                    style={currentTheme?.isDark ? vscDarkPlus : oneLight}
-                    customStyle={{
-                      margin: '0.5rem 0',
-                      borderRadius: '0.5rem',
-                      fontSize: '0.9em',
-                      lineHeight: '1.5',
-                      backgroundColor: 'var(--lesson-card-background)',
-                      border: '1px solid var(--card-border)',
-                      padding: '0.75rem',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                    }}
-                    showLineNumbers={true}
-                    wrapLines={true}
-                    {...props}
-                  >
-                    {codeContent}
-                  </SyntaxHighlighter>
+                  <div className="relative">
+                    <button
+                      onClick={() => handleCopyClick(codeContent, `${language}-${codeContent.slice(0, 20)}`)}
+                      className="absolute right-2 top-2 p-2 rounded-lg transition-all duration-200 hover:bg-opacity-80 flex items-center gap-2"
+                      style={{ 
+                        backgroundColor: 'var(--interactive-hover)',
+                        color: 'var(--text-inverse)',
+                        zIndex: 10
+                      }}
+                      title="Copy code"
+                    >
+                      {copiedStates[`${language}-${codeContent.slice(0, 20)}`] ? (
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className="h-4 w-4" 
+                          viewBox="0 0 20 20" 
+                          fill="currentColor"
+                        >
+                          <path 
+                            fillRule="evenodd" 
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
+                            clipRule="evenodd" 
+                          />
+                        </svg>
+                      ) : (
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className="h-4 w-4" 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor"
+                        >
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" 
+                          />
+                        </svg>
+                      )}
+                    </button>
+                    <SyntaxHighlighter
+                      language={language}
+                      style={currentTheme?.isDark ? vscDarkPlus : oneLight}
+                      customStyle={{
+                        margin: '0.5rem 0',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.9em',
+                        lineHeight: '1.5',
+                        backgroundColor: 'var(--lesson-card-background)',
+                        border: '1px solid var(--card-border)',
+                        padding: '0.75rem',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                      }}
+                      showLineNumbers={true}
+                      wrapLines={true}
+                      {...props}
+                    >
+                      {cleanCodeIndentation(codeContent)}
+                    </SyntaxHighlighter>
+                  </div>
                 );
               },
               h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)' }}>{children}</h1>,
@@ -239,25 +315,67 @@ export default function LessonContent({ content, lessonId }) {
                           }
 
                           return (
-                            <SyntaxHighlighter
-                              language={language}
-                              style={currentTheme?.isDark ? vscDarkPlus : oneLight}
-                              customStyle={{
-                                margin: '0.5rem 0',
-                                borderRadius: '0.5rem',
-                                fontSize: '0.9em',
-                                lineHeight: '1.5',
-                                backgroundColor: 'var(--lesson-card-background)',
-                                border: '1px solid var(--card-border)',
-                                padding: '0.75rem',
-                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                              }}
-                              showLineNumbers={true}
-                              wrapLines={true}
-                              {...props}
-                            >
-                              {codeContent}
-                            </SyntaxHighlighter>
+                            <div className="relative">
+                              <button
+                                onClick={() => handleCopyClick(codeContent, `${language}-${codeContent.slice(0, 20)}`)}
+                                className="absolute right-2 top-2 p-2 rounded-lg transition-all duration-200 hover:bg-opacity-80 flex items-center gap-2"
+                                style={{ 
+                                  backgroundColor: 'var(--interactive-hover)',
+                                  color: 'var(--text-inverse)',
+                                  zIndex: 10
+                                }}
+                                title="Copy code"
+                              >
+                                {copiedStates[`${language}-${codeContent.slice(0, 20)}`] ? (
+                                  <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    className="h-4 w-4" 
+                                    viewBox="0 0 20 20" 
+                                    fill="currentColor"
+                                  >
+                                    <path 
+                                      fillRule="evenodd" 
+                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
+                                      clipRule="evenodd" 
+                                    />
+                                  </svg>
+                                ) : (
+                                  <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    className="h-4 w-4" 
+                                    fill="none" 
+                                    viewBox="0 0 24 24" 
+                                    stroke="currentColor"
+                                  >
+                                    <path 
+                                      strokeLinecap="round" 
+                                      strokeLinejoin="round" 
+                                      strokeWidth={2} 
+                                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" 
+                                    />
+                                  </svg>
+                                )}
+                              </button>
+                              <SyntaxHighlighter
+                                language={language}
+                                style={currentTheme?.isDark ? vscDarkPlus : oneLight}
+                                customStyle={{
+                                  margin: '0.5rem 0',
+                                  borderRadius: '0.5rem',
+                                  fontSize: '0.9em',
+                                  lineHeight: '1.5',
+                                  backgroundColor: 'var(--lesson-card-background)',
+                                  border: '1px solid var(--card-border)',
+                                  padding: '0.75rem',
+                                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                                }}
+                                showLineNumbers={true}
+                                wrapLines={true}
+                                {...props}
+                              >
+                                {cleanCodeIndentation(codeContent)}
+                              </SyntaxHighlighter>
+                            </div>
                           );
                         },
                         h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)' }}>{children}</h1>,
