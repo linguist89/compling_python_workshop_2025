@@ -17,8 +17,26 @@ const lastNames = [
 ];
 
 const countries = [
-  'DK', 'SE', 'NO', 'FI', 'DE', 'FR', 'ES', 'IT', 'GB', 'US',
-  'CA', 'AU', 'NZ', 'JP', 'KR', 'CN', 'BR', 'AR', 'MX', 'ZA'
+  { code: 'DK', name: 'Denmark' },
+  { code: 'SE', name: 'Sweden' },
+  { code: 'NO', name: 'Norway' },
+  { code: 'FI', name: 'Finland' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'FR', name: 'France' },
+  { code: 'ES', name: 'Spain' },
+  { code: 'IT', name: 'Italy' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'US', name: 'United States' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'NZ', name: 'New Zealand' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'KR', name: 'South Korea' },
+  { code: 'CN', name: 'China' },
+  { code: 'BR', name: 'Brazil' },
+  { code: 'AR', name: 'Argentina' },
+  { code: 'MX', name: 'Mexico' },
+  { code: 'ZA', name: 'South Africa' }
 ];
 
 // Generate a random score for a specific lesson part
@@ -73,7 +91,7 @@ const generateRandomQuizAnswers = () => {
 const generateStudentData = async (index) => {
   const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
   const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-  const country = countries[Math.floor(Math.random() * countries.length)];
+  const selectedCountry = countries[Math.floor(Math.random() * countries.length)];
   const name = `${firstName} ${lastName}`;
   
   // Generate quiz data
@@ -82,41 +100,31 @@ const generateStudentData = async (index) => {
   // Create the Firestore data
   const firestoreData = {
     name: name,
-    country: country,
+    userCountry: {
+      code: selectedCountry.code,
+      name: selectedCountry.name
+    },
     user_type: 'student',
     encryptedPassword: CryptoJS.AES.encrypt('1234', ENCRYPTION_KEY).toString(),
     ...quizData,
     progress: {
-      lesson1: {
-        intro: getRandomPartScore('intro'),
-        basics: getRandomPartScore('basics'),
-        advanced: getRandomPartScore('advanced')
-      },
-      lesson2: {
-        intro: getRandomPartScore('intro'),
-        basics: getRandomPartScore('basics'),
-        advanced: getRandomPartScore('advanced')
-      },
-      lesson3: {
-        intro: getRandomPartScore('intro'),
-        basics: getRandomPartScore('basics'),
-        advanced: getRandomPartScore('advanced')
+      hasReachedCompletion: true,
+      lessons: {
+        1: {
+          completedSections: 7,
+          totalSections: 7
+        },
+        2: {
+          completedSections: 7,
+          totalSections: 7
+        },
+        3: {
+          completedSections: 4,
+          totalSections: 4
+        }
       }
     }
   };
-
-  // Create localStorage data
-  const localStorageData = {
-    userName: name,
-    user_type: 'student',
-    country: country,
-    quizDone: true,
-    overallQuizScore: quizData.overallQuizScore,
-    hasShownComplete: Math.random() < 0.5
-  };
-
-  // Save to localStorage
-  localStorage.setItem('userDataPythonWorkshop', JSON.stringify(localStorageData));
 
   return firestoreData;
 };
