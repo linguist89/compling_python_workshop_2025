@@ -2,7 +2,7 @@
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import remarkGfm from 'remark-gfm';
-import AnimatedCodeBlock from '@/app/components/AnimatedCodeBlock';
+import SimplifiedAnimatedCodeBlock from '@/app/components/SimplifiedAnimatedCodeBlock';
 
 export default function LessonContent({ content }) {
   return (
@@ -22,7 +22,11 @@ export default function LessonContent({ content }) {
                     backgroundColor: 'var(--color-secondary)',
                     padding: '0.2em 0.4em',
                     borderRadius: '0.25em',
-                    fontSize: '0.875em'
+                    fontSize: '0.875em',
+                    display: 'inline-block',
+                    verticalAlign: 'middle',
+                    lineHeight: '1.4',
+                    margin: '0 0.2em'
                   }}
                   {...props}
                 >
@@ -31,28 +35,11 @@ export default function LessonContent({ content }) {
               );
             }
 
-            // Use AnimatedCodeBlock for Python code blocks
+            // Use SimplifiedAnimatedCodeBlock for Python code blocks
             if (language === 'python') {
-              // Get the previous sibling's text as description if it exists
-              let description = '';
-              if (node.position && content) {
-                const lines = content.split('\n');
-                const codeBlockStart = node.position.start.line - 1;
-                
-                // Look for description in previous lines
-                for (let i = codeBlockStart - 1; i >= 0; i--) {
-                  const line = lines[i].trim();
-                  if (line === '') break; // Stop at empty line
-                  if (!line.startsWith('#') && !line.startsWith('```')) {
-                    description = line + '\n' + description;
-                  }
-                }
-              }
-
               return (
-                <AnimatedCodeBlock 
+                <SimplifiedAnimatedCodeBlock 
                   code={String(children).replace(/\n$/, '')}
-                  description={description.trim()}
                 />
               );
             }
@@ -96,7 +83,14 @@ export default function LessonContent({ content }) {
               return children; // Return the code block directly without wrapping in p
             }
             return (
-              <p style={{ color: 'var(--text-secondary)' }} className="mb-4" {...props}>
+              <p 
+                style={{ 
+                  color: 'var(--text-secondary)',
+                  lineHeight: '1.8'
+                }} 
+                className="mb-4 flex items-center flex-wrap gap-1" 
+                {...props}
+              >
                 {children}
               </p>
             );
