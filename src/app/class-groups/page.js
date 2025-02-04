@@ -221,7 +221,7 @@ export default function ClassGroupsPage() {
           if (data.user_type === 'student') {
             students.push({
               id: doc.id,
-              name: data.name,
+              name: data.userName,
               quizScore: data.overallQuizScore || 0
             })
           }
