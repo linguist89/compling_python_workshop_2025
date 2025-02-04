@@ -118,6 +118,160 @@ export default function LessonContent({ content, lessonId }) {
     });
   };
 
+  const markdownComponents = {
+    h2: () => null,
+    code({ node, inline, className, children, ...props }) {
+      const match = /language-(\w+)/.exec(className || '');
+      const language = match ? match[1] : 'text';
+      const codeContent = String(children).replace(/\n$/, '');
+      
+      if (inline || !codeContent.includes('\n')) {
+        return (
+          <code 
+            className={className}
+            style={{
+              backgroundColor: 'var(--inline-code-bg)',
+              color: 'var(--inline-code-color)',
+              padding: '0.2em 0.4em',
+              borderRadius: '0.2em',
+              fontSize: '0.9em',
+              fontWeight: '500'
+            }}
+            {...props}
+          >
+            {children}
+          </code>
+        );
+      }
+
+      return (
+        <div className="relative">
+          <button
+            onClick={() => handleCopyClick(codeContent, `${language}-${codeContent.slice(0, 20)}`)}
+            className="absolute right-2 top-2 p-1 rounded-md transition-all duration-200 hover:bg-opacity-80 flex items-center gap-2"
+            style={{ 
+              backgroundColor: 'var(--interactive-hover)',
+              color: 'var(--text-inverse)',
+              zIndex: 10
+            }}
+            title="Copy code"
+          >
+            {copiedStates[`${language}-${codeContent.slice(0, 20)}`] ? (
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-3 w-3" 
+                viewBox="0 0 20 20" 
+                fill="currentColor"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
+                  clipRule="evenodd" 
+                />
+              </svg>
+            ) : (
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-4 w-4" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" 
+                />
+              </svg>
+            )}
+          </button>
+          <SyntaxHighlighter
+            language={language}
+            style={currentTheme?.isDark ? vscDarkPlus : oneLight}
+            customStyle={{
+              margin: '0.5rem 0',
+              borderRadius: '0.5rem',
+              fontSize: '0.9em',
+              lineHeight: '1.5',
+              backgroundColor: 'var(--lesson-card-background)',
+              border: '1px solid var(--card-border)',
+              padding: '0.75rem',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+            }}
+            className="md:!pt-3 !pt-11"
+            showLineNumbers={true}
+            wrapLines={true}
+            {...props}
+          >
+            {cleanCodeIndentation(codeContent)}
+          </SyntaxHighlighter>
+        </div>
+      );
+    },
+    h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)', marginTop: '2rem' }}>{children}</h1>,
+    h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)', marginTop: '2rem' }}>{children}</h3>,
+    h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)', marginTop: '2rem' }}>{children}</h4>,
+    p: ({ children, node }) => {
+      // Check if the previous element is a heading or list
+      const prevElement = node.prev;
+      const isAfterHeading = prevElement && ['h1', 'h2', 'h3', 'h4'].includes(prevElement.tagName);
+      const isAfterList = prevElement && ['ul', 'ol'].includes(prevElement.tagName);
+      const isAfterCode = prevElement && prevElement.tagName === 'code';
+      
+      return (
+        <p style={{ 
+          color: 'var(--text-primary)', 
+          marginTop: isAfterHeading ? '0.75rem' : isAfterList ? '1rem' : isAfterCode ? '2rem' : '1.5rem',
+          marginBottom: '1rem',
+          lineHeight: '1.6'
+        }}>
+          {children}
+        </p>
+      );
+    },
+    li: ({ children, ordered }) => (
+      <li 
+        style={{ 
+          color: 'var(--text-primary)',
+          marginLeft: '1.5rem',
+          listStyleType: ordered ? 'decimal' : 'disc',
+          paddingLeft: '0.5rem',
+          lineHeight: '1.6',
+          marginBottom: '0.5rem'
+        }}
+      >
+        {children}
+      </li>
+    ),
+    ul: ({ children, depth }) => (
+      <ul 
+        style={{ 
+          marginTop: '0.75rem',
+          marginBottom: '1rem',
+          listStyleType: 'disc',
+          paddingLeft: depth > 0 ? '1.5rem' : '1rem'
+        }}
+      >
+        {children}
+      </ul>
+    ),
+    ol: ({ children, depth }) => (
+      <ol 
+        style={{ 
+          marginTop: '0.75rem',
+          marginBottom: '1rem',
+          listStyleType: 'decimal',
+          paddingLeft: depth > 0 ? '1.5rem' : '1rem'
+        }}
+      >
+        {children}
+      </ol>
+    ),
+    strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
+    em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>
+  };
+
   // If not mounted yet, show a simple loading state that matches the theme
   if (!mounted) {
     return (
@@ -136,119 +290,7 @@ export default function LessonContent({ content, lessonId }) {
         <div className="prose prose-invert max-w-none" style={{ color: 'var(--text-primary)' }}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
-            components={{
-              h2: () => null,
-              code({ node, inline, className, children, ...props }) {
-                const match = /language-(\w+)/.exec(className || '');
-                const language = match ? match[1] : 'text';
-                const codeContent = String(children).replace(/\n$/, '');
-                
-                if (inline || !codeContent.includes('\n')) {
-                  return (
-                    <code 
-                      className={className}
-                      style={{
-                        backgroundColor: 'var(--inline-code-bg)',
-                        color: 'var(--inline-code-color)',
-                        padding: '0.2em 0.4em',
-                        borderRadius: '0.2em',
-                        fontSize: '0.9em',
-                        fontWeight: '500'
-                      }}
-                      {...props}
-                    >
-                      {children}
-                    </code>
-                  );
-                }
-
-                return (
-                  <div className="relative">
-                    <button
-                      onClick={() => handleCopyClick(codeContent, `${language}-${codeContent.slice(0, 20)}`)}
-                      className="absolute right-2 top-2 p-1 rounded-md transition-all duration-200 hover:bg-opacity-80 flex items-center gap-2"
-                      style={{ 
-                        backgroundColor: 'var(--interactive-hover)',
-                        color: 'var(--text-inverse)',
-                        zIndex: 10
-                      }}
-                      title="Copy code"
-                    >
-                      {copiedStates[`${language}-${codeContent.slice(0, 20)}`] ? (
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          className="h-3 w-3" 
-                          viewBox="0 0 20 20" 
-                          fill="currentColor"
-                        >
-                          <path 
-                            fillRule="evenodd" 
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
-                            clipRule="evenodd" 
-                          />
-                        </svg>
-                      ) : (
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          className="h-4 w-4" 
-                          fill="none" 
-                          viewBox="0 0 24 24" 
-                          stroke="currentColor"
-                        >
-                          <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth={2} 
-                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" 
-                          />
-                        </svg>
-                      )}
-                    </button>
-                    <SyntaxHighlighter
-                      language={language}
-                      style={currentTheme?.isDark ? vscDarkPlus : oneLight}
-                      customStyle={{
-                        margin: '0.5rem 0',
-                        borderRadius: '0.5rem',
-                        fontSize: '0.9em',
-                        lineHeight: '1.5',
-                        backgroundColor: 'var(--lesson-card-background)',
-                        border: '1px solid var(--card-border)',
-                        padding: '0.75rem',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                      }}
-                      className="md:!pt-3 !pt-11"
-                      showLineNumbers={true}
-                      wrapLines={true}
-                      {...props}
-                    >
-                      {cleanCodeIndentation(codeContent)}
-                    </SyntaxHighlighter>
-                  </div>
-                );
-              },
-              h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)', marginTop: '2rem' }}>{children}</h1>,
-              h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)', marginTop: '2rem' }}>{children}</h3>,
-              h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)', marginTop: '2rem' }}>{children}</h4>,
-              p: ({ children, node }) => {
-                // Check if the previous element is a heading
-                const prevElement = node.prev;
-                const isAfterHeading = prevElement && ['h1', 'h2', 'h3', 'h4'].includes(prevElement.tagName);
-                const isAfterCode = prevElement && prevElement.tagName === 'code';
-                
-                return (
-                  <p style={{ 
-                    color: 'var(--text-primary)', 
-                    marginTop: isAfterHeading ? '0.75rem' : isAfterCode ? '2rem' : '1.5rem'
-                  }}>
-                    {children}
-                  </p>
-                );
-              },
-              li: ({ children }) => <li style={{ color: 'var(--text-primary)' }}>{children}</li>,
-              strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
-              em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>
-            }}
+            components={markdownComponents}
           >
             {mainContent}
           </ReactMarkdown>
@@ -324,119 +366,7 @@ export default function LessonContent({ content, lessonId }) {
                   <div className="" style={{ color: 'var(--text-primary)' }}>
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
-                      components={{
-                        h2: () => null,
-                        code({ node, inline, className, children, ...props }) {
-                          const match = /language-(\w+)/.exec(className || '');
-                          const language = match ? match[1] : 'text';
-                          const codeContent = String(children).replace(/\n$/, '');
-                          
-                          if (inline || !codeContent.includes('\n')) {
-                            return (
-                              <code 
-                                className={className}
-                                style={{
-                                  backgroundColor: 'var(--inline-code-bg)',
-                                  color: 'var(--inline-code-color)',
-                                  padding: '0.2em 0.4em',
-                                  borderRadius: '0.2em',
-                                  fontSize: '0.9em',
-                                  fontWeight: '500'
-                                }}
-                                {...props}
-                              >
-                                {children}
-                              </code>
-                            );
-                          }
-
-                          return (
-                            <div className="relative">
-                              <button
-                                onClick={() => handleCopyClick(codeContent, `${language}-${codeContent.slice(0, 20)}`)}
-                                className="absolute right-2 top-2 p-1 rounded-md transition-all duration-200 hover:bg-opacity-80 flex items-center gap-2"
-                                style={{ 
-                                  backgroundColor: 'var(--interactive-hover)',
-                                  color: 'var(--text-inverse)',
-                                  zIndex: 10
-                                }}
-                                title="Copy code"
-                              >
-                                {copiedStates[`${language}-${codeContent.slice(0, 20)}`] ? (
-                                  <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    className="h-3 w-3" 
-                                    viewBox="0 0 20 20" 
-                                    fill="currentColor"
-                                  >
-                                    <path 
-                                      fillRule="evenodd" 
-                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
-                                      clipRule="evenodd" 
-                                    />
-                                  </svg>
-                                ) : (
-                                  <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    className="h-4 w-4" 
-                                    fill="none" 
-                                    viewBox="0 0 24 24" 
-                                    stroke="currentColor"
-                                  >
-                                    <path 
-                                      strokeLinecap="round" 
-                                      strokeLinejoin="round" 
-                                      strokeWidth={2} 
-                                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" 
-                                    />
-                                  </svg>
-                                )}
-                              </button>
-                              <SyntaxHighlighter
-                                language={language}
-                                style={currentTheme?.isDark ? vscDarkPlus : oneLight}
-                                customStyle={{
-                                  margin: '0.5rem 0',
-                                  borderRadius: '0.5rem',
-                                  fontSize: '0.9em',
-                                  lineHeight: '1.5',
-                                  backgroundColor: 'var(--lesson-card-background)',
-                                  border: '1px solid var(--card-border)',
-                                  padding: '0.75rem',
-                                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                                }}
-                                className="md:!pt-3 !pt-11"
-                                showLineNumbers={true}
-                                wrapLines={true}
-                                {...props}
-                              >
-                                {cleanCodeIndentation(codeContent)}
-                              </SyntaxHighlighter>
-                            </div>
-                          );
-                        },
-                        h1: ({ children }) => <h1 style={{ color: 'var(--text-primary)', marginTop: '2rem' }}>{children}</h1>,
-                        h3: ({ children }) => <h3 style={{ color: 'var(--text-accent)', marginTop: '2rem' }}>{children}</h3>,
-                        h4: ({ children }) => <h4 style={{ color: 'var(--text-accent)', marginTop: '2rem' }}>{children}</h4>,
-                        p: ({ children, node }) => {
-                          // Check if the previous element is a heading
-                          const prevElement = node.prev;
-                          const isAfterHeading = prevElement && ['h1', 'h2', 'h3', 'h4'].includes(prevElement.tagName);
-                          const isAfterCode = prevElement && prevElement.tagName === 'code';
-                          
-                          return (
-                            <p style={{ 
-                              color: 'var(--text-primary)', 
-                              marginTop: isAfterHeading ? '0.75rem' : isAfterCode ? '2rem' : '1.5rem'
-                            }}>
-                              {children}
-                            </p>
-                          );
-                        },
-                        li: ({ children }) => <li style={{ color: 'var(--text-primary)' }}>{children}</li>,
-                        strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
-                        em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>
-                      }}
+                      components={markdownComponents}
                     >
                       {section.content}
                     </ReactMarkdown>

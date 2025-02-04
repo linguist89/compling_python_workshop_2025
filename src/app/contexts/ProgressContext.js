@@ -5,14 +5,15 @@ import { doc, updateDoc, getDoc } from 'firebase/firestore';
 
 export const ProgressContext = createContext();
 
-const TOTAL_LESSONS = 3; // Total number of lessons in the course
-const LESSON_WEIGHT = 100 / TOTAL_LESSONS; // Each lesson is worth 33.33% of total progress
+const TOTAL_LESSONS = 4; // Total number of lessons in the course
+const LESSON_WEIGHT = 100 / TOTAL_LESSONS; // Each lesson is worth 25% of total progress
 
 const initialProgressState = {
   lessons: {
     1: { completedSections: 0, totalSections: 0 },
     2: { completedSections: 0, totalSections: 0 },
-    3: { completedSections: 0, totalSections: 0 }
+    3: { completedSections: 0, totalSections: 0 },
+    4: { completedSections: 0, totalSections: 0 }
   },
   hasReachedCompletion: false
 };
@@ -79,10 +80,22 @@ export function ProgressProvider({ children }) {
 
       // If we have progress in localStorage or Firestore fetch failed, use localStorage data
       if (parsedData.progress) {
-        setProgress(prev => ({
-          ...parsedData.progress,
-          hasReachedCompletion: parsedData.progress.hasReachedCompletion || false
-        }));
+        setProgress(prev => {
+          // Ensure all lessons exist in the progress data
+          const updatedLessons = { ...initialProgressState.lessons };
+          // Preserve existing progress for all lessons
+          Object.entries(parsedData.progress.lessons || {}).forEach(([lessonId, lessonData]) => {
+            updatedLessons[lessonId] = {
+              completedSections: lessonData.completedSections || 0,
+              totalSections: lessonData.totalSections || 0
+            };
+          });
+          
+          return {
+            lessons: updatedLessons,
+            hasReachedCompletion: parsedData.progress.hasReachedCompletion || false
+          };
+        });
       } else {
         setProgress(initialProgressState);
       }

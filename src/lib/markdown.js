@@ -3,7 +3,8 @@ import matter from 'gray-matter';
 const lessonTitles = {
   '1': 'Introduction to Python',
   '2': 'Flow Control',
-  '3': 'Pandas and Matplotlib'
+  '3': 'Pandas and Matplotlib',
+  '4': 'Computational Thinking in Linguistics'
 };
 
 export function getAllMarkdownFiles() {
