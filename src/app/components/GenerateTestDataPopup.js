@@ -21,8 +21,7 @@ export default function GenerateTestDataPopup({ isOpen, onClose }) {
     }
 
     try {
-      const isTeacher = await verifyUserIsTeacher(password);
-      if (!isTeacher) {
+      if (password !== 'generate') {
         setError("Password doesn't match");
         setIsLoading(false);
         return;

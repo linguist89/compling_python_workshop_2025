@@ -17,6 +17,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [quizDone, setQuizDone] = useState(false)
   const [isTeacher, setIsTeacher] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [showTestDataPopup, setShowTestDataPopup] = useState(false)
 
   useEffect(() => {
@@ -25,15 +26,18 @@ export default function Navbar() {
       const parsedData = JSON.parse(savedData)
       setQuizDone(parsedData.quizDone || false)
       setIsTeacher(parsedData.user_type === 'teacher')
+      setIsAdmin(parsedData.user_type === 'admin')
     }
   }, [pathname]) // Re-check when pathname changes
 
   return (
     <nav 
-      className="sticky top-0 z-40 border-b"
+      className="sticky top-0 z-40"
       style={{ 
         backgroundColor: 'var(--color-background)',
-        borderColor: 'var(--card-border)'
+        borderBottomWidth: '1px',
+        borderBottomStyle: 'solid',
+        borderBottomColor: 'var(--card-border)'
       }}
     >
       <div className="container mx-auto px-4">
@@ -131,24 +135,24 @@ export default function Navbar() {
               Settings
             </Link>
             {isTeacher && (
-              <>
-                <Link
-                  href="/class-groups"
-                  className="transition-colors duration-300"
-                  style={{
-                    color: pathname === '/class-groups' ? 'var(--text-accent)' : 'var(--text-primary)',
-                    borderBottom: pathname === '/class-groups' ? '2px solid var(--text-accent)' : 'none'
-                  }}
-                >
-                  Class Groups
-                </Link>
-                <button
-                  onClick={() => setShowTestDataPopup(true)}
-                  className="transition-colors duration-300 text-blue-500 hover:text-blue-600"
-                >
-                  Generate Test Data
-                </button>
-              </>
+              <Link
+                href="/class-groups"
+                className="transition-colors duration-300"
+                style={{
+                  color: pathname === '/class-groups' ? 'var(--text-accent)' : 'var(--text-primary)',
+                  borderBottom: pathname === '/class-groups' ? '2px solid var(--text-accent)' : 'none'
+                }}
+              >
+                Class Groups
+              </Link>
+            )}
+            {isAdmin && (
+              <button
+                onClick={() => setShowTestDataPopup(true)}
+                className="transition-colors duration-300 text-blue-500 hover:text-blue-600"
+              >
+                Generate Test Data
+              </button>
             )}
             {/* Theme Toggle Button */}
             <button
@@ -297,16 +301,18 @@ export default function Navbar() {
                 >
                   Class Groups
                 </Link>
-                <button
-                  onClick={() => {
-                    setShowTestDataPopup(true)
-                    setIsMenuOpen(false)
-                  }}
-                  className="block w-full text-left px-4 py-2 transition-colors duration-300 text-blue-500 hover:text-blue-600"
-                >
-                  Generate Test Data
-                </button>
               </>
+            )}
+            {isAdmin && (
+              <button
+                onClick={() => {
+                  setShowTestDataPopup(true)
+                  setIsMenuOpen(false)
+                }}
+                className="block w-full text-left px-4 py-2 transition-colors duration-300 text-blue-500 hover:text-blue-600"
+              >
+                Generate Test Data
+              </button>
             )}
           </div>
         </div>
