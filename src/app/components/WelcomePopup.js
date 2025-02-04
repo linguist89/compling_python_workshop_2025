@@ -19,6 +19,7 @@ export default function WelcomePopup() {
   const [mode, setMode] = useState('choice') // 'choice', 'register', or 'login'
   const [error, setError] = useState('')
   const [userType, setUserType] = useState('student')
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const savedData = localStorage.getItem('userDataPythonWorkshop')
@@ -49,11 +50,13 @@ export default function WelcomePopup() {
   const handleRegister = async (e) => {
     e.preventDefault()
     if (name.trim() && password && selectedCountry) {
+      setIsLoading(true)
       try {
         // Check if user already exists
         const userDoc = await getDoc(doc(db, 'users', name.trim()))
         if (userDoc.exists()) {
           setError('Username already exists. Please choose another name.')
+          setIsLoading(false)
           return
         }
 
@@ -85,6 +88,8 @@ export default function WelcomePopup() {
       } catch (error) {
         console.error('Error registering:', error)
         setError('Registration failed. Please try again.')
+      } finally {
+        setIsLoading(false)
       }
     }
   }
@@ -92,10 +97,12 @@ export default function WelcomePopup() {
   const handleLogin = async (e) => {
     e.preventDefault()
     if (name.trim() && password) {
+      setIsLoading(true)
       try {
         const userDoc = await getDoc(doc(db, 'users', name.trim()))
         if (!userDoc.exists()) {
           setError('User not found.')
+          setIsLoading(false)
           return
         }
 
@@ -104,6 +111,7 @@ export default function WelcomePopup() {
         
         if (password !== decryptedPassword) {
           setError('Incorrect password.')
+          setIsLoading(false)
           return
         }
 
@@ -124,6 +132,8 @@ export default function WelcomePopup() {
       } catch (error) {
         console.error('Error logging in:', error)
         setError('Login failed. Please try again.')
+      } finally {
+        setIsLoading(false)
       }
     }
   }
@@ -182,7 +192,7 @@ export default function WelcomePopup() {
                 border: '1px solid'
               }}
             >
-              Back to learn more?
+              Not the first time here?
             </button>
           </div>
         )}
@@ -282,16 +292,22 @@ export default function WelcomePopup() {
             <div className="space-y-4">
               <button
                 type="submit"
-                className="w-full px-4 py-2 rounded-lg font-medium transition-all duration-300"
+                className="w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center"
                 style={{
                   backgroundColor: 'var(--text-accent)',
                   color: 'var(--color-dark)',
                   opacity: name.trim() && password && (mode === 'login' || selectedCountry) ? 1 : 0.7,
                   cursor: name.trim() && password && (mode === 'login' || selectedCountry) ? 'pointer' : 'not-allowed'
                 }}
-                disabled={!name.trim() || !password || (mode === 'register' && !selectedCountry)}
+                disabled={!name.trim() || !password || (mode === 'register' && !selectedCountry) || isLoading}
               >
-                {mode === 'register' ? 'Register' : 'Login'}
+                {isLoading ? (
+                  <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-solid border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                    <span className="sr-only">Loading...</span>
+                  </div>
+                ) : (
+                  mode === 'register' ? 'Register' : 'Login'
+                )}
               </button>
 
               <button
@@ -308,6 +324,7 @@ export default function WelcomePopup() {
                   color: 'var(--text-accent)',
                   border: '1px solid'
                 }}
+                disabled={isLoading}
               >
                 Back to Options
               </button>
