@@ -4,6 +4,10 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { ProgressContext } from '@/app/contexts/ProgressContext';
 import { useTheme } from '@/app/contexts/ThemeContext';
@@ -269,7 +273,15 @@ export default function LessonContent({ content, lessonId }) {
       </ol>
     ),
     strong: ({ children }) => <strong style={{ color: 'var(--text-accent)' }}>{children}</strong>,
-    em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>
+    em: ({ children }) => <em style={{ color: 'var(--text-secondary)' }}>{children}</em>,
+    math: ({ value }) => (
+      <div className="my-4 bg-black bg-opacity-90 p-4 rounded-lg shadow-lg">
+        <BlockMath math={value} />
+      </div>
+    ),
+    inlineMath: ({ value }) => (
+      <InlineMath math={value} />
+    )
   };
 
   // If not mounted yet, show a simple loading state that matches the theme
@@ -289,7 +301,8 @@ export default function LessonContent({ content, lessonId }) {
         {/* Main Content */}
         <div className="prose prose-invert max-w-none" style={{ color: 'var(--text-primary)' }}>
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex]}
             components={markdownComponents}
           >
             {mainContent}
@@ -365,7 +378,8 @@ export default function LessonContent({ content, lessonId }) {
                 <div className="p-4">
                   <div className="" style={{ color: 'var(--text-primary)' }}>
                     <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
+                      remarkPlugins={[remarkGfm, remarkMath]}
+                      rehypePlugins={[rehypeKatex]}
                       components={markdownComponents}
                     >
                       {section.content}
