@@ -7,12 +7,12 @@
 # Variable assignments
 age = 25
 name = "John Doe"
-is_student = True
+person_job = "student"
 
 # Print variables and their types
 print(f"Age: {age} ({type(age)})")
 print(f"Name: {name} ({type(name)})")
-print(f"Is Student: {is_student} ({type(is_student)})")
+print(f"Is Student: ({person_job == 'student'})")
 ```
 
 2. **String Operations**

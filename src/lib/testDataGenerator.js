@@ -136,7 +136,7 @@ export const generateTestStudents = async (count) => {
   for (let i = 0; i < count; i++) {
     const studentData = await generateStudentData(i);
     // Use the student's name as the document ID
-    const userRef = doc(db, 'users', studentData.name);
+    const userRef = doc(db, 'testUsers', studentData.name);
     batch.push(setDoc(userRef, studentData));
   }
   
