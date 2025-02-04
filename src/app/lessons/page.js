@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import { getAllMarkdownFiles } from '@/lib/markdown';
 import LessonContent from './components/LessonContent';
 import LessonNavigation from './components/LessonNavigation';
+import ResourcesPopup from './components/ResourcesPopup';
 
 export default function LessonsPage() {
   const [selectedLesson, setSelectedLesson] = useState('1');
   const [lessonContent, setLessonContent] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showResources, setShowResources] = useState(false);
   const lessons = getAllMarkdownFiles();
 
   useEffect(() => {
@@ -52,6 +54,28 @@ export default function LessonsPage() {
               lessons={lessons}
               selectedLesson={selectedLesson}
               onSelectLesson={setSelectedLesson}
+            />
+            
+            {/* Resources Button */}
+            <button
+              onClick={() => setShowResources(true)}
+              className="w-full mt-6 px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+              style={{
+                backgroundColor: 'var(--card-background)',
+                borderColor: 'var(--card-border)',
+                border: '1px solid',
+                color: 'var(--text-accent)'
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+              Resources
+            </button>
+
+            <ResourcesPopup 
+              show={showResources}
+              onClose={() => setShowResources(false)}
             />
           </div>
           
