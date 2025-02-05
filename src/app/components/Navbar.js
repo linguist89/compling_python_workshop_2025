@@ -134,7 +134,7 @@ export default function Navbar() {
             >
               Settings
             </Link>
-            {isTeacher && (
+            {(isTeacher || isAdmin) && (
               <Link
                 href="/class-groups"
                 className="transition-colors duration-300"
